@@ -1,0 +1,16 @@
+[
+{
+  "modid": "macrocosmos",
+  "name": "Macro Cosmos Tech",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Tictim", "alvin137"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
