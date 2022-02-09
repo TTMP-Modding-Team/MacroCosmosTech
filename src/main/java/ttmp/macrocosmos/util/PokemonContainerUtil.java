@@ -19,7 +19,7 @@ public class PokemonContainerUtil{
 	}
 
 	public static PokemonContainer getPC(EntityPlayer player) {
-		return player.world.isRemote ? EmptyPokemonContainer.EMPTY : new PCPokemonContainer(Pixelmon.storageManager.getPCForPlayer((EntityPlayerMP)player));
+		return player.world.isRemote ? EmptyPokemonContainer.EMPTY : new PCPokemonContainer(Pixelmon.storageManager.getPCForPlayer(player.getUniqueID()));
 	}
 
 	public static int firstEmptySlot(PokemonContainer container){

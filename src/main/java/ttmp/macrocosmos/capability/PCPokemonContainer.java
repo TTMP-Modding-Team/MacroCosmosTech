@@ -20,7 +20,7 @@ public class PCPokemonContainer implements PokemonContainer{
 		return SIZE;
 	}
 	@Nullable @Override public Pokemon getPokemon(int index){
-		return pcStorage.get(index, index);
+		return pcStorage.get(index/30, index%30);
 	}
 	@Nullable @Override public UUID getOwnerId(int index){
 		return pcStorage.playerUUID;
@@ -30,7 +30,7 @@ public class PCPokemonContainer implements PokemonContainer{
 				Transaction.success(() -> pcStorage.set(index/30, index%30, pokemon)) : Transaction.fail();
 	}
 
-	public StoragePosition boxPosition(int index){
-		return new StoragePosition(index/30, index%30);
+	public int getBoxIndex(){
+		return pcStorage.getBoxCount();
 	}
 }

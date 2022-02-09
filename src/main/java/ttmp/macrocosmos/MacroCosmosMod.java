@@ -33,6 +33,7 @@ public class MacroCosmosMod{
 		CombeeTypes.init();
 	}
 
+	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event){
 		ModTerminalRegistry.init();
 	}

@@ -16,7 +16,7 @@ public class PokemonSlotController extends Widget{
 	public static final int MOVE = 0;
 	public static final int QUICK_MOVE = 1;
 
-	private final List<SlotData> slot = new ArrayList<>();
+	protected final List<SlotData> slot = new ArrayList<>();
 
 	@Nullable private Integer selectedSlot;
 
