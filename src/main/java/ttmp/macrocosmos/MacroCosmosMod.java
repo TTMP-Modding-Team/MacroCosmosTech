@@ -1,14 +1,17 @@
 package ttmp.macrocosmos;
 
 import com.pixelmonmod.pixelmon.Pixelmon;
+import gregtech.api.terminal.TerminalRegistry;
 import gregtech.api.util.GTLog;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ttmp.macrocosmos.capability.Caps;
 import ttmp.macrocosmos.combeekeeping.CombeeTypes;
 import ttmp.macrocosmos.mte.ModMetaTileEntities;
+import ttmp.macrocosmos.terminal.ModTerminalRegistry;
 
 @Mod(modid = MacroCosmosMod.MODID,
 		name = MacroCosmosMod.NAME,
@@ -28,5 +31,9 @@ public class MacroCosmosMod{
 		ModMetaTileEntities.init();
 		Caps.register();
 		CombeeTypes.init();
+	}
+
+	public void postInit(FMLPostInitializationEvent event){
+		ModTerminalRegistry.init();
 	}
 }

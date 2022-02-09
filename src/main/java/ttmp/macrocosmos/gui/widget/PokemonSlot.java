@@ -75,31 +75,20 @@ public abstract class PokemonSlot extends Widget{
 		return true;
 	}
 
-	public static class ContainerSlot extends PokemonSlot{
+
+
+	public static class PCSlot extends PokemonSlot{
 		private final PokemonContainer container;
 		private final int index;
 
-		public ContainerSlot(PokemonSlotInterface slotInterface, int x, int y, PokemonContainer container, int index, IGuiTexture... slotTextures){
+		public PCSlot(PokemonSlotInterface slotInterface, int x, int y, PokemonContainer container, int index, IGuiTexture... slotTextures){
 			super(slotInterface, x, y, slotTextures);
+			this.index = index;
 			this.container = container;
-			this.index = index;
 		}
 
-		@Nullable @Override public Pokemon getPokemonForRender(){
+		@Nullable @Override public Pokemon getPokemonForRender() {
 			return container.getPokemon(index);
-		}
-	}
-
-	public static class PartySlot extends PokemonSlot{
-		private final int index;
-
-		public PartySlot(PokemonSlotInterface slotInterface, int x, int y, int index, IGuiTexture... slotTextures){
-			super(slotInterface, x, y, slotTextures);
-			this.index = index;
-		}
-
-		@Nullable @Override public Pokemon getPokemonForRender(){
-			return ClientStorageManager.party.get(index);
 		}
 	}
 }

@@ -5,8 +5,6 @@ import gregtech.api.gui.resources.IGuiTexture;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.capability.PokemonContainer;
-import ttmp.macrocosmos.gui.widget.PokemonSlot.ContainerSlot;
-import ttmp.macrocosmos.gui.widget.PokemonSlot.PartySlot;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -34,13 +32,13 @@ public class PokemonSlotController extends Widget{
 	public PokemonSlot newContainerSlot(int x, int y, PokemonContainer container, int index, IGuiTexture... slotTextures){
 		PokemonSlotInterface i = new PokemonSlotInterface(slot.size());
 		slot.add(new SlotData(container, index, false));
-		return new ContainerSlot(i, x, y, container, index, slotTextures);
+		return new ContainerPokemonSlot(i, x, y, container, index, slotTextures);
 	}
 
 	public PokemonSlot newPartySlot(int x, int y, EntityPlayer player, int index, IGuiTexture... slotTextures){
 		PokemonSlotInterface i = new PokemonSlotInterface(slot.size());
 		slot.add(new SlotData(getParty(player), index, true));
-		return new PartySlot(i, x, y, index, slotTextures);
+		return new PartyPokemonSlot(i, x, y, index, slotTextures);
 	}
 
 	@Override public void handleClientAction(int id, PacketBuffer buffer){
@@ -66,17 +64,17 @@ public class PokemonSlotController extends Widget{
 		}
 	}
 
-	@Nullable private SlotData slotData(int id){
+	@Nullable protected SlotData slotData(int id){
 		if(id>=0&&id<slot.size()) return slot.get(id);
 		else return null;
 	}
 
-	private static final class SlotData{
+	protected static final class SlotData{
 		public final PokemonContainer container;
 		public final int index;
 		public final boolean isParty;
 
-		private SlotData(PokemonContainer container, int index, boolean isParty){
+		SlotData(PokemonContainer container, int index, boolean isParty){
 			this.container = container;
 			this.index = index;
 			this.isParty = isParty;
