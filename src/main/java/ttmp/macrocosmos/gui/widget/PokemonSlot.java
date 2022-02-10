@@ -3,7 +3,6 @@ package ttmp.macrocosmos.gui.widget;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.client.gui.GuiHelper;
 import com.pixelmonmod.pixelmon.client.gui.GuiResources;
-import com.pixelmonmod.pixelmon.client.storage.ClientStorageManager;
 import gregtech.api.gui.IRenderContext;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.resources.IGuiTexture;
@@ -76,7 +75,6 @@ public abstract class PokemonSlot extends Widget{
 	}
 
 
-
 	public static class PCSlot extends PokemonSlot{
 		private final PokemonContainer container;
 		private final int index;
@@ -89,8 +87,8 @@ public abstract class PokemonSlot extends Widget{
 			this.controller = controller;
 		}
 
-		@Nullable @Override public Pokemon getPokemonForRender() {
-			return container.getPokemon(index + 30*controller.getBoxIndex());
+		@Nullable @Override public Pokemon getPokemonForRender(){
+			return container.getPokemon(controller.getBoxIndex()*30+index);
 		}
 	}
 }

@@ -22,9 +22,12 @@ public class PokemonBoxSlotController extends PokemonSlotController{
 	@Override public void handleClientAction(int id, PacketBuffer buffer){
 		if(id==MOVE||id==QUICK_MOVE) super.handleClientAction(id, buffer);
 		else if(id==LEFT){
-			moveBoxLeft();
+			if(boxIndex == 0) boxIndex = maxBoxIndex;
+			else boxIndex--;
 		}else if(id==RIGHT){
-			moveBoxRight();
+			System.out.println("DOSOME");
+			if(boxIndex == maxBoxIndex) boxIndex =0;
+			else boxIndex++;
 		}
 	}
 
@@ -33,12 +36,12 @@ public class PokemonBoxSlotController extends PokemonSlotController{
 	}
 
 	public void moveBoxLeft(){
-		if(boxIndex == 0) boxIndex = maxBoxIndex;
-		else boxIndex--;
+		writeClientAction(LEFT, packetBuffer -> {});
+		//if(boxIndex == 0) boxIndex = maxBoxIndex;
+		//else boxIndex--;
 	}
 
 	public void moveBoxRight() {
-		if(boxIndex == maxBoxIndex) boxIndex = 0;
-		else boxIndex++;
+		writeClientAction(RIGHT, packetBuffer -> {});
 	}
 }
