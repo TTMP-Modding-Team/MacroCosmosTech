@@ -13,6 +13,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import ttmp.macrocosmos.capability.RangeWrappedPokemonContainer;
 import ttmp.macrocosmos.gui.widget.PokemonSlotController;
+import ttmp.macrocosmos.mte.trait.ApiaryLogic;
 import ttmp.macrocosmos.mte.trait.PokemonContainerTrait;
 
 public class CombeeApiaryMTE extends MetaTileEntity{
@@ -25,16 +26,17 @@ public class CombeeApiaryMTE extends MetaTileEntity{
 		}
 	};
 
+	private final ApiaryLogic apiaryLogic = new ApiaryLogic(this,
+			new RangeWrappedPokemonContainer(pokemon, 0, 1),
+			new RangeWrappedPokemonContainer(pokemon, 1, 6),
+			new RangeWrappedPokemonContainer(pokemon, 7, 3));
+
 	public CombeeApiaryMTE(ResourceLocation metaTileEntityId){
 		super(metaTileEntityId);
 	}
 
 	@Override public MetaTileEntity createMetaTileEntity(MetaTileEntityHolder metaTileEntityHolder){
 		return new CombeeApiaryMTE(metaTileEntityId);
-	}
-
-	@Override public void update(){
-		super.update();
 	}
 
 	@Override protected IItemHandlerModifiable createImportItemHandler(){

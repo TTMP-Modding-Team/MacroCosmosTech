@@ -2,7 +2,6 @@ package ttmp.macrocosmos.combeekeeping;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
-import gregtech.api.recipes.Recipe;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
@@ -13,12 +12,10 @@ import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
 public class CombeeType{
 	private final String name;
-	private final Recipe production;
 	private final List<Morph> morphs = new ArrayList<>();
 
-	public CombeeType(String name, Recipe production){
+	public CombeeType(String name){
 		this.name = name;
-		this.production = production;
 	}
 
 	public String getName(){
@@ -32,18 +29,18 @@ public class CombeeType{
 	public static class Morph{
 		// TODO predicate?
 		private final double probability;
-		private final String combeeType;
+		private final String morphType;
 
-		public Morph(double probability, String combeeType){
+		public Morph(double probability, String morphType){
 			this.probability = probability;
-			this.combeeType = combeeType;
+			this.morphType = morphType;
 		}
 
 		public double getProbability(){
 			return probability;
 		}
-		public String getCombeeType(){
-			return combeeType;
+		public String getMorphType(){
+			return morphType;
 		}
 	}
 

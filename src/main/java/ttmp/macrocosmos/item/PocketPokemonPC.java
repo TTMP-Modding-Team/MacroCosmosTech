@@ -6,7 +6,6 @@ import com.pixelmonmod.pixelmon.comm.packetHandlers.OpenScreen;
 import com.pixelmonmod.pixelmon.comm.packetHandlers.clientStorage.newStorage.pc.ClientChangeOpenPC;
 import com.pixelmonmod.pixelmon.enums.EnumGuiScreen;
 import com.pixelmonmod.pixelmon.sounds.PixelSounds;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ContainerPlayer;
@@ -15,17 +14,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
-import ttmp.macrocosmos.MacroCosmosMod;
 
 public class PocketPokemonPC extends Item{
-	public PocketPokemonPC() {
+	public PocketPokemonPC(){
 		super();
-		this.setRegistryName(new ResourceLocation(MacroCosmosMod.MODID, "pocketpokemonpc"));
-		this.setCreativeTab(CreativeTabs.COMBAT);
-		this.setTranslationKey(MacroCosmosMod.MODID + "." + "pocketpokemonpc");
 	}
 
 	@Override public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn){

@@ -21,4 +21,7 @@ public class EmptyPokemonContainer implements PokemonContainer{
 	@Override public Transaction setPokemon(int index, @Nullable Pokemon pokemon, @Nullable UUID ownerId){
 		return Transaction.fail();
 	}
+	@Override public boolean isValid(Pokemon pokemon, int index){
+		return false;
+	}
 }

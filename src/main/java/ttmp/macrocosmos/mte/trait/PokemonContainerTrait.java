@@ -54,6 +54,9 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer{
 					pokemonOwners[index] = ownerId;
 				}) : Transaction.fail();
 	}
+	@Override public boolean isValid(Pokemon pokemon, int index){
+		return true;
+	}
 
 	@Nullable private WrappedPokemonStorage storage;
 

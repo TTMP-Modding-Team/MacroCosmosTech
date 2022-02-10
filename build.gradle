@@ -68,9 +68,11 @@ dependencies {
     // at runtime, use the full JEI jar
     runtimeOnly "mezz.jei:jei_1.12.2:4.15.0.268"
 
-    compileOnly files("libs/Pixelmon-1.12.2-8.3.6-universal-deobf.jar")
+    compile "crafttweaker:CraftTweaker2:1.12:4.1.20.674"
 
-    provided files("libs/gregtech-1.12.2-2.1.1-beta.jar")
+    // deobfCompile "pixelmon:Pixelmon-1.12.2:8.3.6:universal"  // Not possible because fuck ForgeGradle
+    compileOnly files("libs/Pixelmon-1.12.2-8.3.6-universal-deobf.jar")
+    deobfCompile "gregtech-ce-unofficial:gregtech-1.12.2:2.1.1:beta"
 }
 
 processResources {

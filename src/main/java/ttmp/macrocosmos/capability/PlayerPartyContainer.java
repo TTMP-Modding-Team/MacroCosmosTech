@@ -33,4 +33,7 @@ public class PlayerPartyContainer implements PokemonContainer{
 		return index>=0&&index<size()&&(pokemon==null||isOwnerOf(ownerId, index)) ?
 				Transaction.success(() -> storage.set(index, pokemon)) : Transaction.fail();
 	}
+	@Override public boolean isValid(Pokemon pokemon, int index){
+		return true;
+	}
 }

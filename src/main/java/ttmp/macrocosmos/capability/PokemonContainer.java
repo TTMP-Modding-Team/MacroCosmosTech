@@ -16,9 +16,7 @@ public interface PokemonContainer{
 
 	Transaction setPokemon(int index, @Nullable Pokemon pokemon, @Nullable UUID ownerId);
 
-	default boolean isValid(Pokemon pokemon, int index){
-		return true;
-	}
+	boolean isValid(Pokemon pokemon, int index);
 
 	///////// DO NOT OVERRIDE BELOW THIS
 
