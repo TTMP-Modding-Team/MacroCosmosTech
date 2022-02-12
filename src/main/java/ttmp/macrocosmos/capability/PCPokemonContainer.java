@@ -33,4 +33,8 @@ public class PCPokemonContainer implements PokemonContainer{
 	public int getBoxIndex(){
 		return pcStorage.getBoxCount();
 	}
+
+	public UUID getPcId(){
+		return pcStorage.uuid;
+	}
 }

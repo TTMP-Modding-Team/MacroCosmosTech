@@ -5,18 +5,24 @@ import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.capability.PCPokemonContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
 
+import java.util.UUID;
+
 public class PokemonBoxSlotController extends PokemonSlotController{
 	public static final int LEFT = 2;
 	public static final int RIGHT = 3;
 	private int boxIndex = 0;
 	private int maxBoxIndex;
+	private UUID pcUUID;
 
 	public PokemonSlot newBoxSlot(int x, int y, PokemonContainer container, int index, IGuiTexture... slotTextures){
 		PokemonSlotInterface i = new PokemonSlotInterface(slot.size());
-		if(container instanceof PCPokemonContainer) maxBoxIndex = ((PCPokemonContainer)container).getBoxIndex();
+		pcUUID = container.getOwnerId(1);
+		if(container instanceof PCPokemonContainer) {
+			maxBoxIndex = ((PCPokemonContainer)container).getBoxIndex();
+		}
 		else maxBoxIndex = 32;
 		slot.add(new SlotData(container, index, false));
-		return new PokemonSlot.PCSlot(i, x, y, container, index, this, slotTextures);
+		return new PCPokemonSlot(i, x, y, container,this, index, slotTextures);
 	}
 
 	@Override public void handleClientAction(int id, PacketBuffer buffer){
@@ -43,5 +49,9 @@ public class PokemonBoxSlotController extends PokemonSlotController{
 
 	public void moveBoxRight() {
 		writeClientAction(RIGHT, packetBuffer -> {});
+	}
+
+	public UUID getPcUUID(){
+		return pcUUID;
 	}
 }

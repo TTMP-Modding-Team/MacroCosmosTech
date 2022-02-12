@@ -7,6 +7,7 @@ import gregtech.api.terminal.app.AbstractApplication;
 import ttmp.macrocosmos.capability.PCPokemonContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.gui.widget.PokemonBoxSlotController;
+import ttmp.macrocosmos.util.PokemonContainerUtil;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
@@ -18,7 +19,7 @@ public class PocketPokemonPCApp extends AbstractApplication{
 
 	@Override public AbstractApplication initApp(){
 		PokemonBoxSlotController controller = new PokemonBoxSlotController();
-		PokemonContainer pcContainer = new PCPokemonContainer(Pixelmon.storageManager.getPCForPlayer(gui.entityPlayer.getUniqueID()));
+		PokemonContainer pcContainer = PokemonContainerUtil.getPC(gui.entityPlayer);
 		addWidget(controller);
 		for(int i = 0; i<5; i++){
 			for(int j = 0; j<6; j++){
