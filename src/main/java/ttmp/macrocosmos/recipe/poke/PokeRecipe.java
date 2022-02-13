@@ -34,7 +34,16 @@ public class PokeRecipe extends Recipe{
 		this.metadata = metadata;
 	}
 
+
+
 	public PokeRecipeMetadata getMetadata(){
 		return metadata;
+	}
+
+	@Override public String toString(){
+		return "PokeRecipe{"+
+				"metadata="+metadata+
+				"recipe="+super.toString()+
+				'}';
 	}
 }

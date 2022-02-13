@@ -1,8 +1,8 @@
 package ttmp.macrocosmos.mte;
 
-import gregtech.common.metatileentities.MetaTileEntities;
 import net.minecraft.util.ResourceLocation;
 
+import static gregtech.common.metatileentities.MetaTileEntities.registerMetaTileEntity;
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
 public class ModMetaTileEntities{
@@ -10,10 +10,12 @@ public class ModMetaTileEntities{
 
 	public static JailMetaTileEntity JAIL;
 	public static CombeeApiaryMTE COMBEE_APIARY;
+	public static PokeRecipeTestMTE RECIPE_TEST;
 
 	public static void init(){
-		JAIL = MetaTileEntities.registerMetaTileEntity(ID, new JailMetaTileEntity(n("jail")));
-		COMBEE_APIARY = MetaTileEntities.registerMetaTileEntity(ID+1, new CombeeApiaryMTE(n("combee_apiary")));
+		JAIL = registerMetaTileEntity(ID, new JailMetaTileEntity(n("jail")));
+		COMBEE_APIARY = registerMetaTileEntity(ID+1, new CombeeApiaryMTE(n("combee_apiary")));
+		RECIPE_TEST = registerMetaTileEntity(ID+2, new PokeRecipeTestMTE(n("recipe_test")));
 	}
 
 	public static ResourceLocation n(String path){

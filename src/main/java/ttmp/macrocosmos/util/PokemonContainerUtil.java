@@ -18,6 +18,9 @@ public class PokemonContainerUtil{
 			if(container.getPokemon(i)==null) return i;
 		return -1;
 	}
+	public static boolean hasEmptySlot(PokemonContainer container){
+		return firstEmptySlot(container)>=0;
+	}
 
 	public static Transaction transferPokemon(PokemonContainer from, int fromIndex, PokemonContainer to, int toIndex){
 		Pokemon p1 = from.getPokemon(fromIndex);

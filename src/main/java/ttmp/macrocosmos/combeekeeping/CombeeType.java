@@ -1,21 +1,20 @@
 package ttmp.macrocosmos.combeekeeping;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import net.minecraft.nbt.NBTTagCompound;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
-public class CombeeType{
+public final class CombeeType{
 	private final String name;
-	private final List<Morph> morphs = new ArrayList<>();
+	private final double eggProductionRate;
 
-	public CombeeType(String name){
-		this.name = name;
+	public CombeeType(String name, double eggProductionRate){
+		if(eggProductionRate<=0) throw new IllegalArgumentException("eggProductionRate");
+		this.name = Objects.requireNonNull(name);
+		this.eggProductionRate = eggProductionRate;
 	}
 
 	public String getName(){
@@ -26,33 +25,29 @@ public class CombeeType{
 		return "name."+MODID+".combee_type."+name;
 	}
 
-	public static class Morph{
-		// TODO predicate?
-		private final double probability;
-		private final String morphType;
+	public double getEggProductionRate(){
+		return eggProductionRate;
+	}
 
-		public Morph(double probability, String morphType){
-			this.probability = probability;
-			this.morphType = morphType;
-		}
+	@Override public String toString(){
+		return "CombeeType{"+name+"}";
+	}
 
-		public double getProbability(){
-			return probability;
-		}
-		public String getMorphType(){
-			return morphType;
-		}
+	@Override public boolean equals(Object o){
+		if(this==o) return true;
+		if(o==null||getClass()!=o.getClass()) return false;
+		CombeeType that = (CombeeType)o;
+		return getName().equals(that.getName());
+	}
+	@Override public int hashCode(){
+		return Objects.hash(getName());
 	}
 
 	private static final String COMBEE_TYPE_KEY = MODID+".combeeType";
 
-	@Nullable public static CombeeType getCombeeType(Pokemon pokemon){
-		if(pokemon.getSpecies()==EnumSpecies.Combee||pokemon.getSpecies()==EnumSpecies.Vespiquen){
-			NBTTagCompound persistentData = pokemon.getPersistentData();
-			String type = persistentData.getString(COMBEE_TYPE_KEY);
-			return CombeeTypes.getCombeeTypes().getOrDefault(type, CombeeTypes.NORMAL);
-		}
-		return null;
+	public static CombeeType getCombeeType(Pokemon pokemon){
+		NBTTagCompound persistentData = pokemon.getPersistentData();
+		return CombeeTypes.getCombeeTypes().getOrDefault(persistentData.getString(COMBEE_TYPE_KEY), CombeeTypes.NORMAL);
 	}
 	public static void setCombeeType(Pokemon pokemon, CombeeType type){
 		NBTTagCompound persistentData = pokemon.getPersistentData();

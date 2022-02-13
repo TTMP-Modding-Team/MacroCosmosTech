@@ -1,5 +1,7 @@
 package ttmp.macrocosmos.mte.trait;
 
+import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import gregtech.api.GTValues;
 import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.impl.RecipeLogicEnergy;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -12,8 +14,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import ttmp.macrocosmos.MacroCosmosMod;
 import ttmp.macrocosmos.capability.Caps;
 import ttmp.macrocosmos.capability.EmptyPokemonContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
@@ -26,13 +30,54 @@ import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class PokemonRecipeLogic extends RecipeLogicEnergy{
+	public static final IEnergyContainer PRIMITIVE_ENERGY_CONTAINER = new IEnergyContainer(){
+		@Override public long acceptEnergyFromNetwork(EnumFacing side, long voltage, long amperage){
+			return 0;
+		}
+		@Override public boolean inputsEnergy(EnumFacing side){
+			return false;
+		}
+		@Override public long changeEnergy(long differenceAmount){
+			return 0;
+		}
+		@Override public long getEnergyStored(){
+			return Integer.MAX_VALUE;
+		}
+		@Override public long getEnergyCapacity(){
+			return Integer.MAX_VALUE;
+		}
+		@Override public long getInputAmperage(){
+			return 1L;
+		}
+		@Override public long getInputVoltage(){
+			return GTValues.LV;
+		}
+		@Override public long getInputPerSec(){
+			return Integer.MAX_VALUE;
+		}
+	};
+
 	private final Supplier<PokemonContainer> pokemonInput;
+	@Nullable protected PokeRecipeMetadata recipeMetadata;
 
 	protected double partialProgressTime;
 
+	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<PokemonContainer> pokemonInput){
+		this(metaTileEntity, recipeMap, () -> PRIMITIVE_ENERGY_CONTAINER, pokemonInput);
+	}
 	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<IEnergyContainer> energyContainer, Supplier<PokemonContainer> pokemonInput){
 		super(metaTileEntity, recipeMap, energyContainer);
 		this.pokemonInput = pokemonInput;
+	}
+
+	public void debug(){ // lol
+		MacroCosmosMod.LOGGER.info("Metadata: {}", recipeMetadata);
+		MacroCosmosMod.LOGGER.info("Fuck: {}| {} / {}", getProgressModifier(), this.partialProgressTime, this.maxProgressTime);
+		IItemHandlerModifiable inv = getInputInventory();
+		for(int i = 0; i<inv.getSlots(); i++){
+			ItemStack stackInSlot = inv.getStackInSlot(i);
+			MacroCosmosMod.LOGGER.info(stackInSlot);
+		}
 	}
 
 	@Override public String getName(){
@@ -59,10 +104,8 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		return super.getInputInventory();
 	}
 
-	@Nullable public PokeRecipeMetadata getPreviousRecipeMetadata(){
-		Recipe previousRecipe = this.getPreviousRecipe();
-		if(previousRecipe==null) return null;
-		return previousRecipe instanceof PokeRecipe ? ((PokeRecipe)previousRecipe).getMetadata() : null;
+	@Override protected boolean canProgressRecipe(){
+		return recipeMetadata==null||recipeMetadata.test(pokemonInput.get());
 	}
 
 	@Override protected void updateRecipeProgress(){
@@ -96,26 +139,25 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	}
 
 	protected double getProgressModifier(){
-		PokeRecipeMetadata metadata = getPreviousRecipeMetadata();
-		if(metadata!=null){
-			double progress = 0;
-			PokemonContainer pokemonContainer = pokemonInput.get();
-			for(int i = 0; i<pokemonContainer.size(); i++)
-				progress += metadata.calculateProgress(pokemonContainer.getPokemon(i));
-			return progress;
-		}else return 1;
+		if(recipeMetadata==null) return 1;
+		double progress = 0;
+		PokemonContainer pokemonContainer = pokemonInput.get();
+		for(int i = 0; i<pokemonContainer.size(); i++){
+			Pokemon pokemon = pokemonContainer.getPokemon(i);
+			if(pokemon!=null) progress += recipeMetadata.calculateProgress(pokemon);
+		}
+		return progress;
 	}
 
-	@Override protected boolean canProgressRecipe(){
-		return super.canProgressRecipe();
-	}
 	@Override protected void setupRecipe(Recipe recipe){
 		super.setupRecipe(recipe);
+		this.recipeMetadata = recipe instanceof PokeRecipe ? ((PokeRecipe)recipe).getMetadata() : null;
 		this.partialProgressTime = 1;
 	}
 	@Override protected void completeRecipe(){
 		super.completeRecipe();
 		this.partialProgressTime = 0;
+		this.recipeMetadata = null;
 	}
 	public void cancelRecipe(){
 		this.progressTime = 0;
@@ -127,22 +169,26 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		this.wasActiveAndNeedsUpdate = true;
 		this.parallelRecipesPerformed = 0;
 		this.partialProgressTime = 0;
+		this.recipeMetadata = null;
 	}
 
 	@Override public NBTTagCompound serializeNBT(){
 		NBTTagCompound tag = super.serializeNBT();
 		tag.setDouble("Progress", partialProgressTime);
+		if(recipeMetadata!=null) tag.setTag("recipeMetadata", recipeMetadata.write());
 		return tag;
 	}
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
 		this.partialProgressTime = tag.getDouble("Progress");
+		this.recipeMetadata = tag.hasKey("recipeMetadata", Constants.NBT.TAG_COMPOUND) ?
+				PokeRecipeMetadata.read(tag.getCompoundTag("recipeMetadata")) : null;
 	}
 
 	/**
 	 * wtf?
 	 */
-	public static final class Wtf implements ICapabilityProvider{
+	@SuppressWarnings("NullableProblems") public static final class Wtf implements ICapabilityProvider{
 		private PokemonContainer container = EmptyPokemonContainer.EMPTY;
 
 		public PokemonContainer getContainer(){
