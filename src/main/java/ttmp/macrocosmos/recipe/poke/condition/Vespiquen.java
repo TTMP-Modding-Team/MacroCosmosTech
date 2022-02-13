@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 public class Vespiquen implements PokemonCondition{
 	public static PokemonCondition read(PacketBuffer buffer){
-		return new Vespiquen(buffer.readBoolean() ? CombeeTypes.get(buffer.readString(Short.MAX_VALUE)) : null);
+		return new Vespiquen(buffer.readBoolean() ? CombeeTypes.withName(buffer.readString(Short.MAX_VALUE)) : null);
 	}
 
 	@Nullable private final CombeeType combeeType;
@@ -21,7 +21,7 @@ public class Vespiquen implements PokemonCondition{
 
 	@Override public boolean test(Pokemon pokemon){
 		return ApiaryLogic.isValidQueen(pokemon)&&
-				(combeeType==null||combeeType==CombeeType.getCombeeType(pokemon));
+				(combeeType==null||combeeType==CombeeTypes.getCombeeType(pokemon));
 	}
 
 	@Override public byte type(){

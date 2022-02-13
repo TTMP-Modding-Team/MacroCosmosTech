@@ -77,11 +77,13 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	}
 
 	@Nullable protected Pokemon makeEgg(Pokemon queen, Pokemon worker){
-		CombeeType qt = CombeeType.getCombeeType(queen);
-		CombeeType wt = CombeeType.getCombeeType(worker);
+		CombeeType qt = CombeeTypes.getCombeeType(queen);
+		CombeeType wt = CombeeTypes.getCombeeType(worker);
 		// TODO do morph shit
 		Pokemon egg = BreedLogic.makeEgg(queen, worker);
-		if(egg!=null) CombeeType.setCombeeType(egg, RNG.nextBoolean() ? qt : wt);
+		if(egg!=null){
+			CombeeTypes.setCombeeType(egg, CombeeTypes.generateType(queen, worker, RNG));
+		}
 		return egg;
 	}
 
@@ -92,7 +94,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 			cancelRecipe();
 			return;
 		}
-		CombeeType type = CombeeType.getCombeeType(queen);
+		CombeeType type = CombeeTypes.getCombeeType(queen);
 		if(queenTypeCache!=type){
 			this.queenTypeCache = type;
 			cancelRecipe();
@@ -131,7 +133,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		for(int i = 0; i<this.workers.size(); i++){
 			Pokemon worker = this.workers.getPokemon(i);
 			if(worker!=null&&isValidWorker(worker)&&queen.getHealth()<=0)
-				progress += recipeMetadata.calculateProgress(worker)/(CombeeType.getCombeeType(worker)==queenTypeCache ? 2 : 3);
+				progress += recipeMetadata.calculateProgress(worker)/(CombeeTypes.getCombeeType(worker)==queenTypeCache ? 2 : 3);
 		}
 		return progress;
 	}
@@ -144,7 +146,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	}
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
-		this.queenTypeCache = tag.hasKey("QueenType", Constants.NBT.TAG_STRING) ? CombeeTypes.get(tag.getString("QueenType")) : null;
+		this.queenTypeCache = tag.hasKey("QueenType", Constants.NBT.TAG_STRING) ? CombeeTypes.withName(tag.getString("QueenType")) : null;
 		this.eggProgress = tag.getDouble("Egg");
 	}
 

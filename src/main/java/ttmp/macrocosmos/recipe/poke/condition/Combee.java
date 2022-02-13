@@ -7,7 +7,7 @@ import ttmp.macrocosmos.combeekeeping.CombeeTypes;
 
 public class Combee implements PokemonCondition{
 	public static Combee read(PacketBuffer buffer){
-		return new Combee(CombeeTypes.get(buffer.readString(Short.MAX_VALUE)));
+		return new Combee(CombeeTypes.withName(buffer.readString(Short.MAX_VALUE)));
 	}
 
 	private final CombeeType type;
@@ -16,7 +16,7 @@ public class Combee implements PokemonCondition{
 	}
 
 	@Override public boolean test(Pokemon pokemon){
-		return CombeeType.getCombeeType(pokemon)==type;
+		return CombeeTypes.getCombeeType(pokemon)==type;
 	}
 	@Override public byte type(){
 		return Types.COMBEE;

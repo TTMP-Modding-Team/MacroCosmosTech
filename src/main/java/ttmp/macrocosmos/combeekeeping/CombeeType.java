@@ -43,14 +43,4 @@ public final class CombeeType{
 		return Objects.hash(getName());
 	}
 
-	private static final String COMBEE_TYPE_KEY = MODID+".combeeType";
-
-	public static CombeeType getCombeeType(Pokemon pokemon){
-		NBTTagCompound persistentData = pokemon.getPersistentData();
-		return CombeeTypes.getCombeeTypes().getOrDefault(persistentData.getString(COMBEE_TYPE_KEY), CombeeTypes.NORMAL);
-	}
-	public static void setCombeeType(Pokemon pokemon, CombeeType type){
-		NBTTagCompound persistentData = pokemon.getPersistentData();
-		persistentData.setString(COMBEE_TYPE_KEY, type.name);
-	}
 }
