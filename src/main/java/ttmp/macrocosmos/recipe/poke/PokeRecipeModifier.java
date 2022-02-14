@@ -2,11 +2,10 @@ package ttmp.macrocosmos.recipe.poke;
 
 import net.minecraft.nbt.NBTTagCompound;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
-import ttmp.macrocosmos.recipe.poke.condition.PokemonConditionSerializer;
 
 public class PokeRecipeModifier{
 	public static PokeRecipeModifier read(NBTTagCompound tag){
-		return new PokeRecipeModifier(PokemonConditionSerializer.readCondition(tag.getByteArray("c")), tag.getDouble("operationSpeed"));
+		return new PokeRecipeModifier(PokemonCondition.readCondition(tag.getByteArray("c")), tag.getDouble("operationSpeed"));
 	}
 
 	private final PokemonCondition condition;
@@ -33,7 +32,7 @@ public class PokeRecipeModifier{
 
 	public NBTTagCompound write(){
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setTag("c", PokemonConditionSerializer.writeToNBT(condition));
+		tag.setByteArray("c", condition.writeToByteArray());
 		tag.setDouble("s", operationSpeed);
 		return tag;
 	}

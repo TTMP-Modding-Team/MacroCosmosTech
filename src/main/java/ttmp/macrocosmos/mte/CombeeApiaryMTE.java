@@ -4,6 +4,7 @@ import codechicken.lib.raytracer.CuboidRayTraceResult;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
+import gregtech.api.capability.impl.NotifiableItemStackHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.LabelWidget;
@@ -14,12 +15,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import ttmp.macrocosmos.capability.RangeWrappedPokemonContainer;
 import ttmp.macrocosmos.gui.widget.PokemonSlotController;
 import ttmp.macrocosmos.mte.trait.ApiaryLogic;
 import ttmp.macrocosmos.mte.trait.PokemonContainerTrait;
-import ttmp.macrocosmos.recipe.ModRecipes;
 
 // TODO egg meter
 public class CombeeApiaryMTE extends MetaTileEntity{
@@ -51,10 +50,10 @@ public class CombeeApiaryMTE extends MetaTileEntity{
 	}
 
 	@Override protected IItemHandlerModifiable createImportItemHandler(){
-		return new ItemStackHandler(6);
+		return new NotifiableItemStackHandler(6, this, false);
 	}
 	@Override protected IItemHandlerModifiable createExportItemHandler(){
-		return new ItemStackHandler(6);
+		return new NotifiableItemStackHandler(6, this, true);
 	}
 
 	@Override protected ModularUI createUI(EntityPlayer player){

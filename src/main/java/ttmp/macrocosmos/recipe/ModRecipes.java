@@ -20,8 +20,7 @@ import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadata;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadataBuilder;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
-import static ttmp.macrocosmos.recipe.poke.condition.PokemonCondition.queen;
-import static ttmp.macrocosmos.recipe.poke.condition.PokemonCondition.type;
+import static ttmp.macrocosmos.recipe.poke.condition.PokemonCondition.*;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class ModRecipes{
@@ -51,7 +50,8 @@ public class ModRecipes{
 						.duration(10)
 						.input(Blocks.DIRT)
 						.output(Blocks.BEDROCK),
-				PokeRecipeMetadata.builder());
+				PokeRecipeMetadata.builder()
+						.condition(always()));
 		registerWithMetadata(TEST, TEST.recipeBuilder()
 						.duration(10)
 						.input(Items.IRON_INGOT)
@@ -62,7 +62,7 @@ public class ModRecipes{
 
 	public static void registerWithMetadata(RecipeMap<?> recipeMap, RecipeBuilder<?> recipe, PokeRecipeMetadataBuilder metadata){
 		PokeRecipeMetadata meta = metadata.build();
-		if(meta.hasCondition()) recipe.notConsumable(new PokeRecipeConditionIngredient(meta));
+		recipe.notConsumable(new PokeRecipeConditionIngredient(meta));
 		ValidationResult<Recipe> r = recipe.build();
 		Recipe result = r.getResult();
 		if(result!=null) result = new PokeRecipe(result, meta);

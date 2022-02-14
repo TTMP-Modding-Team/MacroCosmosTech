@@ -2,6 +2,7 @@ package ttmp.macrocosmos.mte;
 
 import codechicken.lib.raytracer.CuboidRayTraceResult;
 import com.pixelmonmod.pixelmon.storage.PlayerPartyStorage;
+import gregtech.api.capability.impl.NotifiableItemStackHandler;
 import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.widgets.LabelWidget;
@@ -17,7 +18,6 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.gui.widget.PokemonSlotController;
 import ttmp.macrocosmos.mte.trait.PokemonContainerTrait;
@@ -32,7 +32,7 @@ import static gregtech.api.util.GTUtility.formatNumbers;
 
 public class PokeRecipeTestMTE extends MetaTileEntity implements IDataInfoProvider{
 	private final PokemonContainer pokemon = new PokemonContainerTrait(this, 1);
-	private final PokemonRecipeLogic recipeLogic = new PokemonRecipeLogic(this, ModRecipes.TEST, () -> pokemon);
+	private final PokemonRecipeLogic recipeLogic = new PokemonRecipeLogic(this, ModRecipes.TEST, pokemon);
 
 	public PokeRecipeTestMTE(ResourceLocation metaTileEntityId){
 		super(metaTileEntityId);
@@ -51,7 +51,7 @@ public class PokeRecipeTestMTE extends MetaTileEntity implements IDataInfoProvid
 	@Override protected ModularUI createUI(EntityPlayer player){
 		PokemonSlotController controller = new PokemonSlotController();
 
-			ModularUI.Builder builder = recipeLogic.getRecipeMap().createUITemplate(recipeLogic::getProgressPercent, importItems, exportItems, importFluids, exportFluids, 0)
+		ModularUI.Builder builder = recipeLogic.getRecipeMap().createUITemplate(recipeLogic::getProgressPercent, importItems, exportItems, importFluids, exportFluids, 0)
 				.widget(new LabelWidget(5, 5, getMetaFullName()))
 				.bindPlayerInventory(player.inventory, GuiTextures.SLOT, 0)
 				.widget(controller)
@@ -62,10 +62,10 @@ public class PokeRecipeTestMTE extends MetaTileEntity implements IDataInfoProvid
 	}
 
 	@Override protected IItemHandlerModifiable createImportItemHandler(){
-		return new ItemStackHandler(1);
+		return new NotifiableItemStackHandler(1, this, false);
 	}
 	@Override protected IItemHandlerModifiable createExportItemHandler(){
-		return new ItemStackHandler(1);
+		return new NotifiableItemStackHandler(1, this, true);
 	}
 
 	@Nonnull @Override public List<ITextComponent> getDataInfo(){

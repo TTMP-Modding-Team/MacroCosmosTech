@@ -8,16 +8,12 @@ import java.util.EnumSet;
 import java.util.List;
 
 public final class PokeRecipeMetadataBuilder{
-	private final List<PokeRecipeMetadata.ConditionEntry> conditions = new ArrayList<>();
+	private final List<PokemonCondition> conditions = new ArrayList<>();
 	private final EnumSet<WorkType> workStats = EnumSet.noneOf(WorkType.class);
 	private final List<PokeRecipeModifier> modifiers = new ArrayList<>();
 
-	public PokeRecipeMetadataBuilder condition(int index, PokemonCondition condition){
-		conditions.add(new PokeRecipeMetadata.ConditionEntry(index, condition));
-		return this;
-	}
 	public PokeRecipeMetadataBuilder condition(PokemonCondition condition){
-		conditions.add(new PokeRecipeMetadata.ConditionEntry(null, condition));
+		conditions.add(condition);
 		return this;
 	}
 

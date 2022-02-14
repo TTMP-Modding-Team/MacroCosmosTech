@@ -5,7 +5,7 @@ import net.minecraft.network.PacketBuffer;
 
 public class Not implements PokemonCondition{
 	public static Not read(PacketBuffer buffer){
-		return new Not(PokemonConditionSerializer.readCondition(buffer));
+		return new Not(PokemonCondition.readCondition(buffer));
 	}
 
 	private final PokemonCondition condition;

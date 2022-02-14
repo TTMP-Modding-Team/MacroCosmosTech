@@ -1,15 +1,17 @@
 package ttmp.macrocosmos.recipe.poke;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
-import ttmp.macrocosmos.recipe.poke.condition.PokemonConditionSerializer;
+import ttmp.macrocosmos.util.BitMask;
 import ttmp.macrocosmos.util.Join;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -19,10 +21,12 @@ public final class PokeRecipeMetadata{
 		return new PokeRecipeMetadataBuilder();
 	}
 	public static PokeRecipeMetadata read(NBTTagCompound tag){
-		List<ConditionEntry> conditions = new ArrayList<>();
-		NBTTagList nbtConditions = tag.getTagList("c", Constants.NBT.TAG_COMPOUND);
+		List<PokemonCondition> conditions = new ArrayList<>();
+		NBTTagList nbtConditions = tag.getTagList("c", Constants.NBT.TAG_BYTE_ARRAY);
 		for(int i = 0; i<nbtConditions.tagCount(); i++){
-			conditions.add(ConditionEntry.read(nbtConditions.getCompoundTagAt(i)));
+			NBTBase c = nbtConditions.get(i);
+			if(c instanceof NBTTagByteArray)
+				conditions.add(PokemonCondition.readCondition(((NBTTagByteArray)c).getByteArray()));
 		}
 		EnumSet<WorkType> workStats = fromBitMask(tag.getByte("s"));
 		List<PokeRecipeModifier> modifiers = new ArrayList<>();
@@ -33,17 +37,17 @@ public final class PokeRecipeMetadata{
 		return new PokeRecipeMetadata(conditions, workStats, modifiers);
 	}
 
-	private final List<ConditionEntry> conditions;
+	private final List<PokemonCondition> conditions;
 	private final EnumSet<WorkType> workStats;
 	private final List<PokeRecipeModifier> modifiers;
 
-	public PokeRecipeMetadata(List<ConditionEntry> conditions, EnumSet<WorkType> workStats, List<PokeRecipeModifier> modifiers){
+	public PokeRecipeMetadata(List<PokemonCondition> conditions, EnumSet<WorkType> workStats, List<PokeRecipeModifier> modifiers){
 		this.conditions = conditions;
 		this.workStats = workStats;
 		this.modifiers = modifiers;
 	}
 
-	public List<ConditionEntry> getConditions(){
+	public List<PokemonCondition> getConditions(){
 		return conditions;
 	}
 	public EnumSet<WorkType> workStats(){
@@ -58,9 +62,51 @@ public final class PokeRecipeMetadata{
 	}
 
 	public boolean test(PokemonContainer container){
-		for(ConditionEntry c : conditions)
-			if(!c.test(container)) return false;
-		return true;
+		if(container.size()<conditions.size()) return false;
+		if(container.size()>=Long.SIZE){
+			// TODO I don't fucking care. I bet this already will be enough for 97% of the use case
+			throw new UnsupportedOperationException("Input too large");
+		}
+		LongArrayList incompleteConditions = new LongArrayList();
+
+		// Match each pokemon input to each condition.
+		long excludedPokemonFlag = 0;
+		for(PokemonCondition condition : conditions){
+			int count = 0;
+			long pokemonFlag = 0;
+			for(int i = 0; i<container.size(); i++){
+				if(BitMask.get(excludedPokemonFlag, i)) continue;
+				Pokemon pokemon = container.getPokemon(i);
+				if(pokemon==null||!condition.test(pokemon)) continue;
+				count++;
+				pokemonFlag = BitMask.set(pokemonFlag, i, true);
+			}
+			switch(count){
+				case 0: // input is invalid
+					return false;
+				case 1: // we don't have to track it, so we exclude it
+					excludedPokemonFlag |= pokemonFlag;
+					break;
+				default: // otherwise shove it into temp list and think about it later
+					incompleteConditions.add(pokemonFlag);
+					break;
+			}
+		}
+
+		if(incompleteConditions.size()<=1) return true; // don't even have to enter brute force mode
+		return bruteForce(incompleteConditions, 0, 0, container.size());
+	}
+
+	// no sundae
+	private static boolean bruteForce(LongArrayList entries, int index, long usedPokemonFlags, int pokemonSize){
+		if(entries.size()<=index) return true;
+		long pokemon = entries.getLong(index);
+		for(int i = 0; i<pokemonSize; i++)
+			if(!BitMask.get(usedPokemonFlags, i)&& // not used in previous conditions
+					BitMask.get(pokemon, i)&& // matches this condition
+					bruteForce(entries, index+1, BitMask.set(usedPokemonFlags, i, true), pokemonSize)) // can match all the following conditions
+				return true; // lfg
+		return false;
 	}
 
 	public double calculateProgress(Pokemon pokemon){
@@ -91,8 +137,8 @@ public final class PokeRecipeMetadata{
 	public NBTTagCompound write(){
 		NBTTagCompound tag = new NBTTagCompound();
 		NBTTagList conditions = new NBTTagList();
-		for(ConditionEntry c : this.conditions){
-			conditions.appendTag(c.write());
+		for(PokemonCondition c : this.conditions){
+			conditions.appendTag(new NBTTagByteArray(c.writeToByteArray()));
 		}
 		tag.setTag("c", conditions);
 		tag.setByte("s", toBitMask(workStats));
@@ -117,42 +163,5 @@ public final class PokeRecipeMetadata{
 			if((bitMask&1<<t.ordinal())!=0)
 				workTypes.add(t);
 		return workTypes;
-	}
-
-	public static final class ConditionEntry{
-		public static ConditionEntry read(NBTTagCompound tag){
-			return new ConditionEntry(tag.hasKey("i", Constants.NBT.TAG_INT) ? tag.getInteger("i") : null,
-					PokemonConditionSerializer.readCondition(tag.getByteArray("c")));
-		}
-
-		@Nullable private final Integer index;
-		private final PokemonCondition condition;
-
-		public ConditionEntry(@Nullable Integer index, PokemonCondition condition){
-			this.index = index;
-			this.condition = condition;
-		}
-		public boolean test(PokemonContainer container){
-			if(index==null){
-				for(int i = 0; i<container.size(); i++)
-					if(test(container.getPokemon(i))) return true;
-				return false;
-			}
-			return index>=0&&index<container.size()&&test(container.getPokemon(index));
-		}
-		public boolean test(@Nullable Pokemon pokemon){
-			return pokemon!=null&&condition.test(pokemon);
-		}
-
-		@Override public String toString(){
-			return index!=null ? index+"="+condition.toString() : condition.toString();
-		}
-
-		public NBTTagCompound write(){
-			NBTTagCompound tag = new NBTTagCompound();
-			if(index!=null) tag.setInteger("i", index);
-			tag.setTag("c", PokemonConditionSerializer.writeToNBT(condition));
-			return tag;
-		}
 	}
 }

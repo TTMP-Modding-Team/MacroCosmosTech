@@ -22,9 +22,8 @@ public abstract class MultipleCondition implements PokemonCondition{
 	protected abstract String delimiter();
 	protected static PokemonCondition[] readConditions(PacketBuffer buffer){
 		PokemonCondition[] conditions = new PokemonCondition[buffer.readVarInt()];
-		for(int i = 0; i<conditions.length; i++){
-			conditions[i] = PokemonConditionSerializer.readCondition(buffer);
-		}
+		for(int i = 0; i<conditions.length; i++)
+			conditions[i] = PokemonCondition.readCondition(buffer);
 		return conditions;
 	}
 }

@@ -57,17 +57,21 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		}
 	};
 
-	private final Supplier<PokemonContainer> pokemonInput;
+	private final PokemonContainer pokemonInput;
 	@Nullable protected PokeRecipeMetadata recipeMetadata;
 
 	protected double partialProgressTime;
+	protected boolean pokemonUpdated;
 
-	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<PokemonContainer> pokemonInput){
+	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, PokemonContainer pokemonInput){
 		this(metaTileEntity, recipeMap, () -> PRIMITIVE_ENERGY_CONTAINER, pokemonInput);
 	}
-	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<IEnergyContainer> energyContainer, Supplier<PokemonContainer> pokemonInput){
+	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<IEnergyContainer> energyContainer, PokemonContainer pokemonInput){
 		super(metaTileEntity, recipeMap, energyContainer);
 		this.pokemonInput = pokemonInput;
+		if(pokemonInput instanceof PokemonContainer.Notifiable){
+			((PokemonContainer.Notifiable)pokemonInput).addListener((index, container) -> markPokemonUpdated(true));
+		}
 	}
 
 	public void debug(){ // lol
@@ -95,7 +99,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		if(inputInventoryWrappedPokemonContainerInputItemStack!=null){
 			inputInventoryWrappedPokemonContainerInputItemStack.setCount(1);
 			Wtf wtf = inputInventoryWrappedPokemonContainerInputItemStack.getCapability(Caps.WTF, null);
-			if(wtf!=null) wtf.setContainer(pokemonInput.get());
+			if(wtf!=null) wtf.setContainer(pokemonInput);
 		}
 		return inputInventory;
 	}
@@ -104,14 +108,23 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		return super.getInputInventory();
 	}
 
+	@Override protected void trySearchNewRecipe(){
+		super.trySearchNewRecipe();
+		markPokemonUpdated(false);
+	}
+
+	@Override protected boolean hasNotifiedInputs(){
+		return pokemonUpdated||super.hasNotifiedInputs();
+	}
+
 	@Override protected boolean canProgressRecipe(){
-		return recipeMetadata==null||recipeMetadata.test(pokemonInput.get());
+		return recipeMetadata==null||recipeMetadata.test(pokemonInput);
 	}
 
 	@Override protected void updateRecipeProgress(){
 		if(progress()){
 			//as recipe starts with progress on 1 this has to be > only not => to compensate for it
-			if(progressTime>=maxProgressTime+1) completeRecipe();
+			if(partialProgressTime>=maxProgressTime+1) completeRecipe();
 			if(this.hasNotEnoughEnergy&&getEnergyInputPerSecond()>19L*recipeEUt)
 				this.hasNotEnoughEnergy = false;
 		}else if(recipeEUt>0){
@@ -119,11 +132,22 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 			//generators always have enough energy
 			this.hasNotEnoughEnergy = true;
 			//if current progress value is greater than 2, decrement it by 2
-			if(progressTime>=2){
-				if(ConfigHolder.machines.recipeProgressLowEnergy) this.progressTime = 1;
-				else this.progressTime = Math.max(1, progressTime-2);
+			if(partialProgressTime>1){
+				switch(getRecipeHaltBehavior()){
+					case CLEAR_PROGRESS:
+						this.partialProgressTime = 1;
+						break;
+					case DECREMENT_PROGRESS:
+						this.partialProgressTime = Math.max(1, partialProgressTime-2);
+						break;
+				}
+				progressTime = Math.max(1, (int)partialProgressTime);
 			}
 		}
+	}
+
+	protected RecipeHaltBehavior getRecipeHaltBehavior(){
+		return ConfigHolder.machines.recipeProgressLowEnergy ? RecipeHaltBehavior.CLEAR_PROGRESS : RecipeHaltBehavior.DECREMENT_PROGRESS;
 	}
 
 	protected boolean progress(){
@@ -141,9 +165,8 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	protected double getProgressModifier(){
 		if(recipeMetadata==null) return 1;
 		double progress = 0;
-		PokemonContainer pokemonContainer = pokemonInput.get();
-		for(int i = 0; i<pokemonContainer.size(); i++){
-			Pokemon pokemon = pokemonContainer.getPokemon(i);
+		for(int i = 0; i<pokemonInput.size(); i++){
+			Pokemon pokemon = pokemonInput.getPokemon(i);
 			if(pokemon!=null) progress += recipeMetadata.calculateProgress(pokemon);
 		}
 		return progress;
@@ -172,6 +195,10 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		this.recipeMetadata = null;
 	}
 
+	public void markPokemonUpdated(boolean pokemonUpdated){
+		this.pokemonUpdated = pokemonUpdated;
+	}
+
 	@Override public NBTTagCompound serializeNBT(){
 		NBTTagCompound tag = super.serializeNBT();
 		tag.setDouble("Progress", partialProgressTime);
@@ -183,6 +210,12 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		this.partialProgressTime = tag.getDouble("Progress");
 		this.recipeMetadata = tag.hasKey("recipeMetadata", Constants.NBT.TAG_COMPOUND) ?
 				PokeRecipeMetadata.read(tag.getCompoundTag("recipeMetadata")) : null;
+	}
+
+	public enum RecipeHaltBehavior{
+		KEEP_PROGRESS,
+		DECREMENT_PROGRESS,
+		CLEAR_PROGRESS
 	}
 
 	/**

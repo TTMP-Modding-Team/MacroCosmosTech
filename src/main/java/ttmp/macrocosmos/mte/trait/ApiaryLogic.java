@@ -32,7 +32,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	private double eggProgress;
 
 	public ApiaryLogic(MetaTileEntity metaTileEntity, PokemonContainer queen, PokemonContainer workers, PokemonContainer eggs){
-		super(metaTileEntity, ModRecipes.COMBEE, () -> queen);
+		super(metaTileEntity, ModRecipes.COMBEE, queen);
 		this.queen = queen;
 		this.workers = workers;
 		this.eggs = eggs;
@@ -77,13 +77,8 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	}
 
 	@Nullable protected Pokemon makeEgg(Pokemon queen, Pokemon worker){
-		CombeeType qt = CombeeTypes.getCombeeType(queen);
-		CombeeType wt = CombeeTypes.getCombeeType(worker);
-		// TODO do morph shit
 		Pokemon egg = BreedLogic.makeEgg(queen, worker);
-		if(egg!=null){
-			CombeeTypes.setCombeeType(egg, CombeeTypes.generateType(queen, worker, RNG));
-		}
+		if(egg!=null) CombeeTypes.setCombeeType(egg, CombeeTypes.generateType(queen, worker, RNG));
 		return egg;
 	}
 
@@ -112,6 +107,10 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 			}
 		}
 		return false;
+	}
+
+	@Override protected RecipeHaltBehavior getRecipeHaltBehavior(){
+		return RecipeHaltBehavior.KEEP_PROGRESS;
 	}
 
 	@Override protected boolean progress(){

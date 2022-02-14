@@ -35,4 +35,15 @@ public interface PokemonContainer{
 	default Transaction setPokemonEmpty(int index){
 		return setPokemon(index, null, (UUID)null);
 	}
+
+	interface Notifiable{
+		void addListener(Listener listener);
+	}
+
+	@FunctionalInterface
+	interface Listener{
+		void onPokemonChange(int index, PokemonContainer container);
+
+		default void onStartListening(Runnable eventRemover){}
+	}
 }

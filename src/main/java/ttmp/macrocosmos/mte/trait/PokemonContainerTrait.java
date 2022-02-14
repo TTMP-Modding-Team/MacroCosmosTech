@@ -7,6 +7,8 @@ import com.pixelmonmod.pixelmon.api.storage.StoragePosition;
 import com.pixelmonmod.pixelmon.comm.EnumUpdateType;
 import gregtech.api.metatileentity.MTETrait;
 import gregtech.api.metatileentity.MetaTileEntity;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -24,11 +26,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class PokemonContainerTrait extends MTETrait implements PokemonContainer{
+public class PokemonContainerTrait extends MTETrait implements PokemonContainer, PokemonContainer.Notifiable{
 	private static final int SYNC_POKEMON = 1;
 
 	private final Pokemon[] pokemons;
 	private final UUID[] pokemonOwners;
+
+	private int listenerIdIncrement = 0;
+	private final Int2ObjectMap<Listener> listeners = new Int2ObjectOpenHashMap<>();
 
 	public PokemonContainerTrait(MetaTileEntity mte, int size){
 		super(mte);
@@ -126,6 +131,12 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer{
 		receiveInitialData(buffer);
 	}
 
+	@Override public void addListener(Listener listener){
+		int key = listenerIdIncrement++;
+		listeners.put(key, listener);
+		listener.onStartListening(() -> listeners.remove(key));
+	}
+
 	private class WrappedPokemonStorage extends PokemonStorage{
 		public WrappedPokemonStorage(){
 			super(UUID.randomUUID());
@@ -191,6 +202,8 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer{
 		@Override public void notifyListeners(StoragePosition position, Pokemon pokemon, EnumUpdateType... dataTypes){
 			super.notifyListeners(position, pokemon, dataTypes);
 			if(this.getShouldSendUpdates()&&dataTypes!=null) syncPokemon();
+			for(Listener l : listeners.values().toArray(new Listener[0]))
+				l.onPokemonChange(position.order, PokemonContainerTrait.this);
 		}
 	}
 }
