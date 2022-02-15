@@ -10,12 +10,10 @@ public class ModMetaTileEntities{
 
 	public static JailMetaTileEntity JAIL;
 	public static CombeeApiaryMTE COMBEE_APIARY;
-	public static PokeRecipeTestMTE RECIPE_TEST;
 
 	public static void init(){
 		JAIL = registerMetaTileEntity(ID, new JailMetaTileEntity(n("jail")));
 		COMBEE_APIARY = registerMetaTileEntity(ID+1, new CombeeApiaryMTE(n("combee_apiary")));
-		RECIPE_TEST = registerMetaTileEntity(ID+2, new PokeRecipeTestMTE(n("recipe_test")));
 	}
 
 	public static ResourceLocation n(String path){

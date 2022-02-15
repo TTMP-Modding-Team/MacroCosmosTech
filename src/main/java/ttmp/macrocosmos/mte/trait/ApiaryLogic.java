@@ -7,7 +7,6 @@ import com.pixelmonmod.pixelmon.util.helpers.BreedLogic;
 import gregtech.api.metatileentity.MetaTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
-import ttmp.macrocosmos.MacroCosmosMod;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
 import ttmp.macrocosmos.combeekeeping.CombeeTypes;
@@ -37,11 +36,6 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		this.queen = queen;
 		this.workers = workers;
 		this.eggs = eggs;
-	}
-
-	@Override public void debug(){
-		super.debug();
-		MacroCosmosMod.LOGGER.info("{}", queenTypeCache);
 	}
 
 	@Nullable private Pokemon queen(){

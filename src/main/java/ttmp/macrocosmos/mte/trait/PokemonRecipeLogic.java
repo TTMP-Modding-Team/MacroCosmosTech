@@ -17,7 +17,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-import ttmp.macrocosmos.MacroCosmosMod;
 import ttmp.macrocosmos.capability.Caps;
 import ttmp.macrocosmos.capability.EmptyPokemonContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
@@ -71,16 +70,6 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		this.pokemonInput = pokemonInput;
 		if(pokemonInput instanceof PokemonContainer.Notifiable){
 			((PokemonContainer.Notifiable)pokemonInput).addListener((index, container) -> markPokemonUpdated(true));
-		}
-	}
-
-	public void debug(){ // lol
-		MacroCosmosMod.LOGGER.info("Metadata: {}", recipeMetadata);
-		MacroCosmosMod.LOGGER.info("Fuck: {}| {} / {}", getProgressModifier(), this.partialProgressTime, this.maxProgressTime);
-		IItemHandlerModifiable inv = getInputInventory();
-		for(int i = 0; i<inv.getSlots(); i++){
-			ItemStack stackInSlot = inv.getStackInSlot(i);
-			MacroCosmosMod.LOGGER.info(stackInSlot);
 		}
 	}
 
