@@ -6,6 +6,8 @@ import ttmp.macrocosmos.capability.EmptyPokemonContainer;
 import ttmp.macrocosmos.capability.PlayerPartyContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PokemonContainerUtil{
@@ -41,5 +43,14 @@ public class PokemonContainerUtil{
 		return Transaction.multiple(
 				from.setPokemon(fromIndex, p2, o2),
 				to.setPokemon(toIndex, p1, o1));
+	}
+
+	public static Pokemon[] toArray(PokemonContainer container, boolean excludeEmptySlot){
+		List<Pokemon> l = new ArrayList<>();
+		for(int i = 0; i<container.size(); i++){
+			Pokemon pokemon = container.getPokemon(i);
+			if(!excludeEmptySlot||pokemon!=null) l.add(pokemon);
+		}
+		return l.toArray(new Pokemon[0]);
 	}
 }

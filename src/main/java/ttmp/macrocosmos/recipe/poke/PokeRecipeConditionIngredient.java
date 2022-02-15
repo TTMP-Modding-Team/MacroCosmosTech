@@ -26,7 +26,7 @@ public class PokeRecipeConditionIngredient extends Ingredient{
 		this.metadata = metadata;
 	}
 
-	@Override public boolean test(@Nullable ItemStack input){
+	@Override public boolean apply(@Nullable ItemStack input){
 		if(input==null) return false;
 		PokemonRecipeLogic.Wtf wtf = input.getCapability(Caps.WTF, null);
 		return wtf!=null&&this.metadata.test(wtf.getContainer());

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static ttmp.macrocosmos.MacroCosmosMod.MODID;
+
 public class ApiaryLogic extends PokemonRecipeLogic{
 	protected static final Random RNG = new Random();
 
@@ -29,7 +31,6 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	private final PokemonContainer eggs;
 
 	@Nullable private CombeeType queenTypeCache;
-	private double eggProgress;
 
 	public ApiaryLogic(MetaTileEntity metaTileEntity, PokemonContainer queen, PokemonContainer workers, PokemonContainer eggs){
 		super(metaTileEntity, ModRecipes.COMBEE, queen);
@@ -40,7 +41,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 
 	@Override public void debug(){
 		super.debug();
-		MacroCosmosMod.LOGGER.info("{} {}", queenTypeCache, eggProgress);
+		MacroCosmosMod.LOGGER.info("{}", queenTypeCache);
 	}
 
 	@Nullable private Pokemon queen(){
@@ -50,11 +51,18 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	@Override public void update(){
 		updateQueenType();
 		super.update();
-		if(queenTypeCache!=null){
-			while(eggProgress>=queenTypeCache.getEggProductionRate()){
-				if(produceEgg())
-					eggProgress -= queenTypeCache.getEggProductionRate();
+		Pokemon queen = queen();
+		if(queen!=null){
+			CombeeType t = CombeeTypes.getCombeeType(queen);
+			double eggProgress = getEggProgress(queen);
+			boolean sfaewf = false;
+			while(eggProgress>=t.getMaxEggProduction()){
+				if(produceEgg()){
+					eggProgress -= t.getMaxEggProduction();
+					sfaewf = true;
+				}
 			}
+			if(sfaewf) setEggProgress(queen, eggProgress);
 		}
 	}
 
@@ -115,16 +123,15 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 
 	@Override protected boolean progress(){
 		if(super.progress()){
-			if(PokemonContainerUtil.hasEmptySlot(eggs))
-				this.eggProgress += getProgressModifier();
-			else this.eggProgress = 0;
+			Pokemon queen = queen();
+			if(queen!=null&&PokemonContainerUtil.hasEmptySlot(eggs))
+				setEggProgress(queen, getEggProgress(queen)+getProgressModifier());
 			return true;
 		}else return false;
 	}
 
 	@Override protected double getProgressModifier(){
 		if(recipeMetadata==null) return 0;
-		if(queenTypeCache==null) return 0;
 		Pokemon queen = queen();
 		if(queen==null||queen.getHealth()<=0) return 0;
 
@@ -132,21 +139,26 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		for(int i = 0; i<this.workers.size(); i++){
 			Pokemon worker = this.workers.getPokemon(i);
 			if(worker!=null&&isValidWorker(worker)&&queen.getHealth()<=0)
-				progress += recipeMetadata.calculateProgress(worker)/(CombeeTypes.getCombeeType(worker)==queenTypeCache ? 2 : 3);
+				progress += recipeMetadata.calculateProgress(worker)/(CombeeTypes.getCombeeType(worker)==CombeeTypes.getCombeeType(queen) ? 2 : 3);
 		}
 		return progress;
+	}
+
+	public double getEggProgressPercentage(){
+		Pokemon queen = queen();
+		if(queen==null) return 0;
+		CombeeType type = CombeeTypes.getCombeeType(queen);
+		return getEggProgress(queen)/type.getMaxEggProduction();
 	}
 
 	@Override public NBTTagCompound serializeNBT(){
 		NBTTagCompound tag = super.serializeNBT();
 		if(queenTypeCache!=null) tag.setString("QueenType", queenTypeCache.getName());
-		if(eggProgress>0) tag.setDouble("Egg", eggProgress);
 		return tag;
 	}
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
 		this.queenTypeCache = tag.hasKey("QueenType", Constants.NBT.TAG_STRING) ? CombeeTypes.withName(tag.getString("QueenType")) : null;
-		this.eggProgress = tag.getDouble("Egg");
 	}
 
 	public static boolean isValidQueen(Pokemon pokemon){
@@ -154,5 +166,16 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	}
 	public static boolean isValidWorker(Pokemon pokemon){
 		return !pokemon.isEgg()&&pokemon.getSpecies()==EnumSpecies.Combee;
+	}
+
+	private static final String EGG_PROGRESS_KEY = MODID+".egg";
+
+	public static double getEggProgress(Pokemon pokemon){
+		NBTTagCompound persistentData = pokemon.getPersistentData();
+		return persistentData.getDouble(EGG_PROGRESS_KEY);
+	}
+	public static void setEggProgress(Pokemon pokemon, double progress){
+		NBTTagCompound persistentData = pokemon.getPersistentData();
+		persistentData.setDouble(EGG_PROGRESS_KEY, progress);
 	}
 }

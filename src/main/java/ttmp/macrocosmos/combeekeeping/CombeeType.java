@@ -1,20 +1,17 @@
 package ttmp.macrocosmos.combeekeeping;
 
-import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import net.minecraft.nbt.NBTTagCompound;
-
 import java.util.Objects;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
 public final class CombeeType{
 	private final String name;
-	private final double eggProductionRate;
+	private final double maxEggProduction;
 
-	public CombeeType(String name, double eggProductionRate){
-		if(eggProductionRate<=0) throw new IllegalArgumentException("eggProductionRate");
+	public CombeeType(String name, double maxEggProduction){
+		if(maxEggProduction<=0) throw new IllegalArgumentException("eggProductionRate");
 		this.name = Objects.requireNonNull(name);
-		this.eggProductionRate = eggProductionRate;
+		this.maxEggProduction = maxEggProduction;
 	}
 
 	public String getName(){
@@ -25,8 +22,8 @@ public final class CombeeType{
 		return "name."+MODID+".combee_type."+name;
 	}
 
-	public double getEggProductionRate(){
-		return eggProductionRate;
+	public double getMaxEggProduction(){
+		return maxEggProduction;
 	}
 
 	@Override public String toString(){

@@ -38,6 +38,9 @@ public class CombeeApiaryMTE extends MetaTileEntity{
 
 	public CombeeApiaryMTE(ResourceLocation metaTileEntityId){
 		super(metaTileEntityId);
+		this.pokemon.addListener((index, container) -> {
+			if(index==0) apiaryLogic.markPokemonUpdated(true);
+		});
 	}
 
 	@Override public boolean onRightClick(EntityPlayer playerIn, EnumHand hand, EnumFacing facing, CuboidRayTraceResult hitResult){
