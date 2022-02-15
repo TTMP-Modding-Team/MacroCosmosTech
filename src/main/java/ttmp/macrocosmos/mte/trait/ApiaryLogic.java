@@ -124,16 +124,16 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		}else return false;
 	}
 
-	@Override protected double getProgressModifier(){
-		if(recipeMetadata==null) return 0;
+	@Override protected float getProgressModifier(){
 		Pokemon queen = queen();
 		if(queen==null||queen.getHealth()<=0) return 0;
 
-		double progress = recipeMetadata.calculateProgress(queen);
+		float progress = pokeRecipeMap.getProgress(queen, recipeMetadata);
 		for(int i = 0; i<this.workers.size(); i++){
 			Pokemon worker = this.workers.getPokemon(i);
 			if(worker!=null&&isValidWorker(worker)&&queen.getHealth()<=0)
-				progress += recipeMetadata.calculateProgress(worker)/(CombeeTypes.getCombeeType(worker)==CombeeTypes.getCombeeType(queen) ? 2 : 3);
+				progress += pokeRecipeMap.getProgress(worker, recipeMetadata)/
+						(CombeeTypes.getCombeeType(worker)==CombeeTypes.getCombeeType(queen) ? 2 : 3);
 		}
 		return progress;
 	}

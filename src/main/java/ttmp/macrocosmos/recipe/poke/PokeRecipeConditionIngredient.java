@@ -19,17 +19,19 @@ public class PokeRecipeConditionIngredient extends Ingredient{
 		return ItemHolder.item;
 	}
 
+	private final PokeRecipeMap<?> recipeMap;
 	private final PokeRecipeMetadata metadata;
 
-	public PokeRecipeConditionIngredient(PokeRecipeMetadata metadata){
+	public PokeRecipeConditionIngredient(PokeRecipeMap<?> recipeMap, PokeRecipeMetadata metadata){
 		super(getItem());
+		this.recipeMap = recipeMap;
 		this.metadata = metadata;
 	}
 
 	@Override public boolean apply(@Nullable ItemStack input){
 		if(input==null) return false;
 		PokemonRecipeLogic.Wtf wtf = input.getCapability(Caps.WTF, null);
-		return wtf!=null&&this.metadata.test(wtf.getContainer());
+		return wtf!=null&&this.recipeMap.test(wtf.getContainer(), this.metadata);
 	}
 
 	@Override public String toString(){

@@ -6,7 +6,6 @@ import gregtech.api.capability.IEnergyContainer;
 import gregtech.api.capability.impl.RecipeLogicEnergy;
 import gregtech.api.metatileentity.MetaTileEntity;
 import gregtech.api.recipes.Recipe;
-import gregtech.api.recipes.RecipeMap;
 import gregtech.common.ConfigHolder;
 import gregtech.common.inventory.handlers.SingleItemStackHandler;
 import net.minecraft.item.ItemStack;
@@ -22,12 +21,14 @@ import ttmp.macrocosmos.capability.EmptyPokemonContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.item.ModItems;
 import ttmp.macrocosmos.recipe.poke.PokeRecipe;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeMap;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadata;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
+// TOdo "work meter" and skills
 public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	public static final IEnergyContainer PRIMITIVE_ENERGY_CONTAINER = new IEnergyContainer(){
 		@Override public long acceptEnergyFromNetwork(EnumFacing side, long voltage, long amperage){
@@ -56,17 +57,19 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		}
 	};
 
+	protected final PokeRecipeMap<?> pokeRecipeMap;
 	private final PokemonContainer pokemonInput;
 	@Nullable protected PokeRecipeMetadata recipeMetadata;
 
-	protected double partialProgressTime;
+	protected float partialProgressTime;
 	protected boolean pokemonUpdated;
 
-	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, PokemonContainer pokemonInput){
+	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, PokeRecipeMap<?> recipeMap, PokemonContainer pokemonInput){
 		this(metaTileEntity, recipeMap, () -> PRIMITIVE_ENERGY_CONTAINER, pokemonInput);
 	}
-	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, RecipeMap<?> recipeMap, Supplier<IEnergyContainer> energyContainer, PokemonContainer pokemonInput){
+	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, PokeRecipeMap<?> recipeMap, Supplier<IEnergyContainer> energyContainer, PokemonContainer pokemonInput){
 		super(metaTileEntity, recipeMap, energyContainer);
+		this.pokeRecipeMap = recipeMap;
 		this.pokemonInput = pokemonInput;
 		if(pokemonInput instanceof PokemonContainer.Notifiable){
 			((PokemonContainer.Notifiable)pokemonInput).addListener((index, container) -> markPokemonUpdated(true));
@@ -107,7 +110,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	}
 
 	@Override protected boolean canProgressRecipe(){
-		return recipeMetadata==null||recipeMetadata.test(pokemonInput);
+		return pokeRecipeMap.test(this.pokemonInput, this.recipeMetadata);
 	}
 
 	@Override protected void updateRecipeProgress(){
@@ -143,7 +146,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		if(!canRecipeProgress||!drawEnergy(recipeEUt, true)) return false;
 		drawEnergy(recipeEUt, false);
 
-		double progressModifier = getProgressModifier();
+		float progressModifier = getProgressModifier();
 		if(progressModifier>0){
 			partialProgressTime += progressModifier;
 			progressTime = Math.max(1, (int)partialProgressTime);
@@ -151,12 +154,11 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		return true;
 	}
 
-	protected double getProgressModifier(){
-		if(recipeMetadata==null) return 1;
-		double progress = 0;
+	protected float getProgressModifier(){
+		float progress = 0;
 		for(int i = 0; i<pokemonInput.size(); i++){
 			Pokemon pokemon = pokemonInput.getPokemon(i);
-			if(pokemon!=null) progress += recipeMetadata.calculateProgress(pokemon);
+			if(pokemon!=null) progress += pokeRecipeMap.getProgress(pokemon, recipeMetadata);
 		}
 		return progress;
 	}
@@ -190,15 +192,15 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 
 	@Override public NBTTagCompound serializeNBT(){
 		NBTTagCompound tag = super.serializeNBT();
-		tag.setDouble("Progress", partialProgressTime);
-		if(recipeMetadata!=null) tag.setTag("recipeMetadata", recipeMetadata.write());
+		tag.setFloat("Progress", partialProgressTime);
+		if(recipeMetadata!=null) tag.setByteArray("recipeMetadata", recipeMetadata.writeToByteArray());
 		return tag;
 	}
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
-		this.partialProgressTime = tag.getDouble("Progress");
-		this.recipeMetadata = tag.hasKey("recipeMetadata", Constants.NBT.TAG_COMPOUND) ?
-				PokeRecipeMetadata.read(tag.getCompoundTag("recipeMetadata")) : null;
+		this.partialProgressTime = tag.getFloat("Progress");
+		this.recipeMetadata = tag.hasKey("recipeMetadata", Constants.NBT.TAG_BYTE_ARRAY) ?
+				PokeRecipeMetadata.read(tag.getByteArray("recipeMetadata")) : null;
 	}
 
 	public enum RecipeHaltBehavior{

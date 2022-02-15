@@ -8,9 +8,9 @@ import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
 import ttmp.macrocosmos.util.TypedSerializable;
 
-public interface PokemonCondition extends TypedSerializable{
-	boolean test(Pokemon pokemon);
+import java.util.function.Predicate;
 
+public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 	static PokemonCondition always(){
 		return Always.ALWAYS;
 	}
