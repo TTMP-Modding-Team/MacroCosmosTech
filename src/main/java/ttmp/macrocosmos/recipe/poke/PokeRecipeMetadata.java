@@ -85,7 +85,8 @@ public final class PokeRecipeMetadata{
 				case 0: // input is invalid
 					return false;
 				case 1: // we don't have to track it, so we exclude it
-					excludedPokemonFlag |= pokemonFlag;
+					if(exclude(incompleteConditions, excludedPokemonFlag |= pokemonFlag))
+						return false;
 					break;
 				default: // otherwise shove it into temp list and think about it later
 					incompleteConditions.add(pokemonFlag);
@@ -94,7 +95,36 @@ public final class PokeRecipeMetadata{
 		}
 
 		if(incompleteConditions.size()<=1) return true; // don't even have to enter brute force mode
+
+		// Remove conditions that is positive for all pokemon, since there's no possibility of them being false positive
+		long usedPokemon = 0;
+		for(int i = 0; i<incompleteConditions.size(); i++)
+			usedPokemon |= incompleteConditions.getLong(i);
+		for(int i = 0; i<incompleteConditions.size(); i++){
+			if(usedPokemon==incompleteConditions.getLong(i)){
+				incompleteConditions.removeLong(i);
+				i--;
+			}
+		}
+
+		if(incompleteConditions.size()<=1) return true; // check again before (possibly) the most expensive part of the algorithm
+
 		return bruteForce(incompleteConditions, 0, 0, container.size());
+	}
+
+	/**
+	 * @return {@code true} if input is invalid
+	 */
+	private static boolean exclude(LongArrayList entries, long excluded){
+		for(int i = 0; i<entries.size(); i++){
+			long bits = entries.getLong(i);
+			long modifiedBits = BitMask.removeAll(bits, excluded);
+			if(modifiedBits!=bits){
+				if(modifiedBits==0) return true; // input is invalid
+				entries.set(i, modifiedBits);
+			}
+		}
+		return false;
 	}
 
 	// no sundae
