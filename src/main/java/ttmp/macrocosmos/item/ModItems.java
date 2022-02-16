@@ -8,13 +8,19 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.annotation.Nonnull;
+
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 
 @Mod.EventBusSubscriber(modid = MODID)
 @GameRegistry.ObjectHolder(MODID)
 public class ModItems{
-	public static final Item POCKETPOKEMONPC = null;
-	public static final Item SHH = null;
+	@SuppressWarnings("ConstantConditions") @Nonnull private static <T> T definitelyNotNull(){
+		return null;
+	}
+
+	public static final Item POCKETPOKEMONPC = definitelyNotNull();
+	public static final Item SHH = definitelyNotNull();
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> e){

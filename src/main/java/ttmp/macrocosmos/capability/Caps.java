@@ -7,13 +7,18 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import ttmp.macrocosmos.mte.trait.PokemonRecipeLogic;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class Caps{
+	@SuppressWarnings("ConstantConditions") @Nonnull private static <T> T definitelyNotNull(){
+		return null;
+	}
+
 	@CapabilityInject(PokemonContainer.class)
-	public static final Capability<PokemonContainer> POKEMON_CONTAINER = null;
+	public static final Capability<PokemonContainer> POKEMON_CONTAINER = definitelyNotNull();
 	@CapabilityInject(PokemonRecipeLogic.PokeRecipeIngredientCap.class)
-	public static final Capability<PokemonRecipeLogic.PokeRecipeIngredientCap> POKE_RECIPE_INGREDIENT = null;
+	public static final Capability<PokemonRecipeLogic.PokeRecipeIngredientCap> POKE_RECIPE_INGREDIENT = definitelyNotNull();
 
 	public static void register(){
 		register(PokemonContainer.class);
