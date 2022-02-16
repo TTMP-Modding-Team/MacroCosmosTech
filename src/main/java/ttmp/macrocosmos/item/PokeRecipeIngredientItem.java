@@ -8,9 +8,8 @@ import ttmp.macrocosmos.mte.trait.PokemonRecipeLogic;
 
 import javax.annotation.Nullable;
 
-// PRCWII for short
-public class PokeRecipeContainerWrapperIngredientItem extends Item{
+public class PokeRecipeIngredientItem extends Item{
 	@Nullable @Override public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt){
-		return new PokemonRecipeLogic.Wtf();
+		return new PokemonRecipeLogic.PokeRecipeIngredientCap();
 	}
 }

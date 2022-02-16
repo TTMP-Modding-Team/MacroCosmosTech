@@ -12,15 +12,15 @@ import javax.annotation.Nullable;
 public class Caps{
 	@CapabilityInject(PokemonContainer.class)
 	public static final Capability<PokemonContainer> POKEMON_CONTAINER = null;
-	@CapabilityInject(PokemonRecipeLogic.Wtf.class)
-	public static final Capability<PokemonRecipeLogic.Wtf> WTF = null;
+	@CapabilityInject(PokemonRecipeLogic.PokeRecipeIngredientCap.class)
+	public static final Capability<PokemonRecipeLogic.PokeRecipeIngredientCap> POKE_RECIPE_INGREDIENT = null;
 
 	public static void register(){
-		registerShit(PokemonContainer.class);
-		registerShit(PokemonRecipeLogic.Wtf.class);
+		register(PokemonContainer.class);
+		register(PokemonRecipeLogic.PokeRecipeIngredientCap.class);
 	}
 
-	private static <T> void registerShit(Class<T> clazz){
+	private static <T> void register(Class<T> clazz){
 		CapabilityManager.INSTANCE.register(clazz, new Capability.IStorage<T>(){
 			@Nullable @Override public NBTBase writeNBT(Capability<T> capability, T instance, EnumFacing side){
 				return null;

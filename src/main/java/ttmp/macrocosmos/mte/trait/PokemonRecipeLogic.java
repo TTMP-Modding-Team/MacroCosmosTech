@@ -80,18 +80,18 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		return "pokemon_recipe_logic";
 	}
 
-	@Nullable private ItemStack inputInventoryWrappedPokemonContainerInputItemStack;
+	@Nullable private ItemStack ingredientWrapperItem;
 	@Nullable private IItemHandlerModifiable inputInventory;
 
 	@Override protected IItemHandlerModifiable getInputInventory(){
 		if(inputInventory==null){
-			inputInventoryWrappedPokemonContainerInputItemStack = new ItemStack(ModItems.SHH);
-			inputInventory = new CombinedInvWrapper(new SingleItemStackHandler(inputInventoryWrappedPokemonContainerInputItemStack), getActualInputInventory());
+			ingredientWrapperItem = new ItemStack(ModItems.SHH);
+			inputInventory = new CombinedInvWrapper(new SingleItemStackHandler(ingredientWrapperItem), getActualInputInventory());
 		}
-		if(inputInventoryWrappedPokemonContainerInputItemStack!=null){
-			inputInventoryWrappedPokemonContainerInputItemStack.setCount(1);
-			Wtf wtf = inputInventoryWrappedPokemonContainerInputItemStack.getCapability(Caps.WTF, null);
-			if(wtf!=null) wtf.setContainer(pokemonInput);
+		if(ingredientWrapperItem!=null){
+			ingredientWrapperItem.setCount(1);
+			PokeRecipeIngredientCap cap = ingredientWrapperItem.getCapability(Caps.POKE_RECIPE_INGREDIENT, null);
+			if(cap!=null) cap.setContainer(pokemonInput);
 		}
 		return inputInventory;
 	}
@@ -212,7 +212,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	/**
 	 * wtf?
 	 */
-	@SuppressWarnings("NullableProblems") public static final class Wtf implements ICapabilityProvider{
+	@SuppressWarnings("NullableProblems") public static final class PokeRecipeIngredientCap implements ICapabilityProvider{
 		private PokemonContainer container = EmptyPokemonContainer.EMPTY;
 
 		public PokemonContainer getContainer(){
@@ -223,10 +223,10 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		}
 
 		@Override public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
-			return capability==Caps.WTF;
+			return capability==Caps.POKE_RECIPE_INGREDIENT;
 		}
 		@Nullable @Override public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
-			return capability==Caps.WTF ? Caps.WTF.cast(this) : null;
+			return capability==Caps.POKE_RECIPE_INGREDIENT ? Caps.POKE_RECIPE_INGREDIENT.cast(this) : null;
 		}
 	}
 }

@@ -13,7 +13,6 @@ import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 @Mod.EventBusSubscriber(modid = MODID)
 @GameRegistry.ObjectHolder(MODID)
 public class ModItems{
-
 	public static final Item POCKETPOKEMONPC = null;
 	public static final Item SHH = null;
 
@@ -21,7 +20,7 @@ public class ModItems{
 	public static void registerItems(RegistryEvent.Register<Item> e){
 		IForgeRegistry<Item> registry = e.getRegistry();
 		register(registry, "pocketpokemonpc", new PocketPokemonPC().setMaxStackSize(1));
-		registry.register(new PokeRecipeContainerWrapperIngredientItem().setRegistryName("shh"));
+		registry.register(new PokeRecipeIngredientItem().setRegistryName("poke_recipe_ingredient"));
 	}
 
 	private static void register(IForgeRegistry<Item> registry, String name, Item item){

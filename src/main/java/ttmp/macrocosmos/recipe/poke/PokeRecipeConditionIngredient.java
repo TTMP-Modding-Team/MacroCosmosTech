@@ -30,8 +30,8 @@ public class PokeRecipeConditionIngredient extends Ingredient{
 
 	@Override public boolean apply(@Nullable ItemStack input){
 		if(input==null) return false;
-		PokemonRecipeLogic.Wtf wtf = input.getCapability(Caps.WTF, null);
-		return wtf!=null&&this.recipeMap.test(wtf.getContainer(), this.metadata);
+		PokemonRecipeLogic.PokeRecipeIngredientCap cap = input.getCapability(Caps.POKE_RECIPE_INGREDIENT, null);
+		return cap!=null&&this.recipeMap.test(cap.getContainer(), this.metadata);
 	}
 
 	@Override public String toString(){
