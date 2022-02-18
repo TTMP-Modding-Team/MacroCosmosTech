@@ -13,4 +13,8 @@ public interface ByteSerializable{
 		buffer.getBytes(0, bytes);
 		return bytes;
 	}
+
+	static PacketBuffer createBufferFromBytes(byte[] bytes){
+		return new PacketBuffer(Unpooled.wrappedBuffer(bytes));
+	}
 }

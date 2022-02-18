@@ -3,9 +3,9 @@ package ttmp.macrocosmos.recipe.poke.condition;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumSpecies;
 import com.pixelmonmod.pixelmon.enums.EnumType;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
+import ttmp.macrocosmos.util.ByteSerializable;
 import ttmp.macrocosmos.util.TypedSerializable;
 
 import java.util.function.Predicate;
@@ -46,7 +46,7 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 	}
 
 	static PokemonCondition readCondition(byte[] bytes){
-		return readCondition(new PacketBuffer(Unpooled.wrappedBuffer(bytes)));
+		return readCondition(ByteSerializable.createBufferFromBytes(bytes));
 	}
 	static PokemonCondition readCondition(PacketBuffer buffer){
 		switch(buffer.readByte()){

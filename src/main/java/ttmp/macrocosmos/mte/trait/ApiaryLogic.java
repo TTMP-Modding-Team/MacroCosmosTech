@@ -11,13 +11,18 @@ import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
 import ttmp.macrocosmos.combeekeeping.CombeeTypes;
 import ttmp.macrocosmos.recipe.ModRecipes;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeSkillBonus;
+import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
+import ttmp.macrocosmos.util.ActivePokemonSkillBonuses;
 import ttmp.macrocosmos.util.PokemonContainerUtil;
+import ttmp.macrocosmos.util.PokemonWorkCache;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
@@ -30,6 +35,9 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	private final PokemonContainer eggs;
 
 	@Nullable private CombeeType queenTypeCache;
+
+	protected final ActivePokemonSkillBonuses combeeSkillBonuses = new ActivePokemonSkillBonuses();
+	protected final PokemonWorkCache combeeWorkCache = new PokemonWorkCache(this);
 
 	public ApiaryLogic(MetaTileEntity metaTileEntity, PokemonContainer queen, PokemonContainer workers, PokemonContainer eggs){
 		super(metaTileEntity, ModRecipes.COMBEE, queen);
@@ -49,14 +57,14 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		if(queen!=null){
 			CombeeType t = CombeeTypes.getCombeeType(queen);
 			double eggProgress = getEggProgress(queen);
-			boolean sfaewf = false;
+			boolean eggProgressModified = false;
 			while(eggProgress>=t.getMaxEggProduction()){
 				if(produceEgg()){
 					eggProgress -= t.getMaxEggProduction();
-					sfaewf = true;
+					eggProgressModified = true;
 				}
 			}
-			if(sfaewf) setEggProgress(queen, eggProgress);
+			if(eggProgressModified) setEggProgress(queen, eggProgress);
 		}
 	}
 
@@ -86,11 +94,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 
 	protected void updateQueenType(){
 		Pokemon queen = queen();
-		if(queen==null){
-			this.queenTypeCache = null;
-			cancelRecipe();
-			return;
-		}
+		if(queen==null) return;
 		CombeeType type = CombeeTypes.getCombeeType(queen);
 		if(queenTypeCache!=type){
 			this.queenTypeCache = type;
@@ -119,21 +123,28 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		if(super.progress()){
 			Pokemon queen = queen();
 			if(queen!=null&&PokemonContainerUtil.hasEmptySlot(eggs))
-				setEggProgress(queen, getEggProgress(queen)+getProgressModifier());
+				setEggProgress(queen, getEggProgress(queen)+workToProgress());
 			return true;
 		}else return false;
 	}
 
-	@Override protected float getProgressModifier(){
+	@Override protected float workToProgress(){
 		Pokemon queen = queen();
 		if(queen==null||queen.getHealth()<=0) return 0;
 
-		float progress = pokeRecipeMap.getProgress(queen, recipeMetadata);
+		PokemonValue progressValue = defaultMetadata.getProgress(recipeMetadata);
+		Set<PokeRecipeSkillBonus> skillBonus = defaultMetadata.getSkillBonus(recipeMetadata);
+		float progress = this.workCache.consumeWork(0, queen, progressValue.getValue(queen))
+				*this.skillBonuses.getSkillBonus(0, queen, skillBonus);
+		CombeeType queenType = CombeeTypes.getCombeeType(queen);
 		for(int i = 0; i<this.workers.size(); i++){
 			Pokemon worker = this.workers.getPokemon(i);
-			if(worker!=null&&isValidWorker(worker)&&queen.getHealth()<=0)
-				progress += pokeRecipeMap.getProgress(worker, recipeMetadata)/
-						(CombeeTypes.getCombeeType(worker)==CombeeTypes.getCombeeType(queen) ? 2 : 3);
+			if(worker!=null&&isValidWorker(worker)&&worker.getHealth()<=0){
+				progress += this.combeeWorkCache.consumeWork(i, worker,
+						progressValue.getValue(worker)/
+								(CombeeTypes.getCombeeType(worker)==queenType ? 2 : 3))
+						*this.combeeSkillBonuses.getSkillBonus(i, worker, skillBonus);
+			}
 		}
 		return progress;
 	}
@@ -148,11 +159,15 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	@Override public NBTTagCompound serializeNBT(){
 		NBTTagCompound tag = super.serializeNBT();
 		if(queenTypeCache!=null) tag.setString("QueenType", queenTypeCache.getName());
+		tag.setTag("CombeeSkillBonuses", combeeSkillBonuses.write());
+		tag.setTag("CombeeWorkCache", combeeWorkCache.write());
 		return tag;
 	}
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
 		this.queenTypeCache = tag.hasKey("QueenType", Constants.NBT.TAG_STRING) ? CombeeTypes.withName(tag.getString("QueenType")) : null;
+		this.combeeSkillBonuses.read(tag.getTagList("CombeeSkillBonuses", Constants.NBT.TAG_COMPOUND));
+		this.combeeWorkCache.read(tag.getTagList("CombeeWorkCache", Constants.NBT.TAG_COMPOUND));
 	}
 
 	public static boolean isValidQueen(Pokemon pokemon){

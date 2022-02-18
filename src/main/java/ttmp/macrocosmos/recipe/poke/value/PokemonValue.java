@@ -3,9 +3,9 @@ package ttmp.macrocosmos.recipe.poke.value;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
 import com.pixelmonmod.pixelmon.enums.EnumType;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
+import ttmp.macrocosmos.util.ByteSerializable;
 import ttmp.macrocosmos.util.TypedSerializable;
 
 import java.text.DecimalFormat;
@@ -72,21 +72,10 @@ public interface PokemonValue extends TypedSerializable{
 	static PokemonValue condition(PokemonCondition condition, PokemonValue onTrue, PokemonValue onFalse){
 		return new SelectedValue(condition, onTrue, onFalse);
 	}
-	static PokemonValue stat(){
+	static PokemonValue allStat(){
 		return RawStatValue.all();
 	}
 	static PokemonValue stat(StatsType... stats){
-		return stats.length==0 ? zero() : new RawStatValue(stats);
-	}
-	static PokemonValue overallStat(){
-		// HP is omitted because they already contribute to operation and it uses different formula for calculation
-		// defence stats were also omitted because they already contribute to operation
-		return overallStat(StatsType.Attack, StatsType.SpecialAttack, StatsType.Speed);
-	}
-	static PokemonValue overallStat(StatsType... stats){
-		return stats.length==0 ? zero() : new AdjustedStatValue(stats);
-	}
-	static PokemonValue statsSum(StatsType... stats){
 		return stats.length==0 ? zero() : new RawStatValue(stats);
 	}
 	static PokemonValue level(){
@@ -98,9 +87,15 @@ public interface PokemonValue extends TypedSerializable{
 	static PokemonValue effectiveness(EnumType type){
 		return new EffectivenessValue(type);
 	}
+	static PokemonValue ability(){
+		return SingletonValue.ABILITY;
+	}
+	static PokemonValue div(PokemonValue num, PokemonValue denom){
+		return new DivValue(num, denom);
+	}
 
 	static PokemonValue readValue(byte[] bytes){
-		return readValue(new PacketBuffer(Unpooled.wrappedBuffer(bytes)));
+		return readValue(ByteSerializable.createBufferFromBytes(bytes));
 	}
 	static PokemonValue readValue(PacketBuffer buffer){
 		switch(buffer.readByte()){
@@ -124,14 +119,16 @@ public interface PokemonValue extends TypedSerializable{
 				return SelectedValue.read(buffer);
 			case Types.RAW_STAT:
 				return RawStatValue.read(buffer);
-			case Types.ADJUSTED_STAT:
-				return AdjustedStatValue.read(buffer);
 			case Types.LEVEL:
 				return SingletonValue.LEVEL;
 			case Types.DEGRADATION:
 				return SingletonValue.DEGRADATION;
 			case Types.EFFECTIVENESS:
 				return EffectivenessValue.read(buffer);
+			case Types.ABILITY:
+				return SingletonValue.ABILITY;
+			case Types.DIV:
+				return DivValue.read(buffer);
 		}
 		return null;
 	}
@@ -150,9 +147,10 @@ public interface PokemonValue extends TypedSerializable{
 		byte CONDITION = 7;
 		byte SELECT = 8;
 		byte RAW_STAT = 9;
-		byte ADJUSTED_STAT = 10;
-		byte LEVEL = 11;
-		byte DEGRADATION = 12;
-		byte EFFECTIVENESS = 13;
+		byte LEVEL = 10;
+		byte DEGRADATION = 11;
+		byte EFFECTIVENESS = 12;
+		byte ABILITY = 13;
+		byte DIV = 14;
 	}
 }

@@ -2,8 +2,9 @@ package ttmp.macrocosmos.util;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.RandomAccess;
 
-public class CombinedList<T> extends AbstractList<T>{
+public class CombinedList<T> extends AbstractList<T> implements RandomAccess{
 	public static <T> List<T> of(List<T> first, List<T> second){
 		if(first.isEmpty()) return second;
 		if(second.isEmpty()) return first;

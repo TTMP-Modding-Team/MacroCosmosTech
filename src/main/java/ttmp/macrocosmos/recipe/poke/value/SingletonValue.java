@@ -35,6 +35,14 @@ public enum SingletonValue implements PokemonValue{
 		@Override public String toString(){
 			return "Degradation";
 		}
+	},
+	ABILITY(Types.ABILITY){
+		@Override public float getValue(Pokemon pokemon){
+			return 0; // TODO
+		}
+		@Override public String toString(){
+			return "Ability";
+		}
 	};
 
 	private final byte type;

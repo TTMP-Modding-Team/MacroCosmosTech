@@ -18,7 +18,6 @@ import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadataBuilder;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
 import static ttmp.macrocosmos.recipe.poke.condition.PokemonCondition.queen;
-import static ttmp.macrocosmos.recipe.poke.value.PokemonValue.*;
 
 @Mod.EventBusSubscriber(modid = MODID)
 public class ModRecipes{
@@ -33,12 +32,7 @@ public class ModRecipes{
 						.input(Blocks.DIRT)
 						.output(Blocks.BEDROCK),
 				PokeRecipeMetadata.builder()
-						.condition(queen(CombeeTypes.NORMAL))
-						.hpToWorkConversionRate(one())
-						.progress(mul(
-								overallStat(),
-								degradation()
-						)));
+						.condition(queen(CombeeTypes.NORMAL)));
 	}
 
 	public static void registerWithMetadata(PokeRecipeMap<?> recipeMap, RecipeBuilder<?> recipe, PokeRecipeMetadataBuilder metadata){
