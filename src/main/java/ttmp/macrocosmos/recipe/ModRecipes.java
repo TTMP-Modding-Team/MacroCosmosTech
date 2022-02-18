@@ -37,7 +37,7 @@ public class ModRecipes{
 
 	public static void registerWithMetadata(PokeRecipeMap<?> recipeMap, RecipeBuilder<?> recipe, PokeRecipeMetadataBuilder metadata){
 		PokeRecipeMetadata meta = metadata.build();
-		recipe.notConsumable(new PokeRecipeConditionIngredient(recipeMap, meta));
+		recipe.notConsumable(new PokeRecipeConditionIngredient(recipeMap.getDefaultMetadata(), meta));
 		ValidationResult<Recipe> r = recipe.build();
 		Recipe result = r.getResult();
 		if(result!=null) result = new PokeRecipe(result, meta);

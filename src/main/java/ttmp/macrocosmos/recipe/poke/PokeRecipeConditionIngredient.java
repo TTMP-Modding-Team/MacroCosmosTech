@@ -5,6 +5,7 @@ import net.minecraft.item.crafting.Ingredient;
 import ttmp.macrocosmos.capability.Caps;
 import ttmp.macrocosmos.item.ModItems;
 import ttmp.macrocosmos.mte.trait.PokemonRecipeLogic;
+import ttmp.macrocosmos.util.PokeRecipeMatch;
 
 import javax.annotation.Nullable;
 
@@ -19,22 +20,25 @@ public class PokeRecipeConditionIngredient extends Ingredient{
 		return ItemHolder.item;
 	}
 
-	private final PokeRecipeMap<?> recipeMap;
-	private final PokeRecipeMetadata metadata;
+	private final PokeRecipeMetadata defaultMetadata;
+	private final PokeRecipeMetadata overrideMetadata;
 
-	public PokeRecipeConditionIngredient(PokeRecipeMap<?> recipeMap, PokeRecipeMetadata metadata){
+	public PokeRecipeConditionIngredient(PokeRecipeMetadata recipeMap, PokeRecipeMetadata overrideMetadata){
 		super(getItem());
-		this.recipeMap = recipeMap;
-		this.metadata = metadata;
+		this.defaultMetadata = recipeMap;
+		this.overrideMetadata = overrideMetadata;
 	}
 
 	@Override public boolean apply(@Nullable ItemStack input){
 		if(input==null) return false;
 		PokemonRecipeLogic.PokeRecipeIngredientCap cap = input.getCapability(Caps.POKE_RECIPE_INGREDIENT, null);
-		return cap!=null&&this.recipeMap.test(cap.getContainer(), this.metadata);
+		return cap!=null&&PokeRecipeMatch.test(this.defaultMetadata.getConditions(this.overrideMetadata), cap.getContainer());
 	}
 
 	@Override public String toString(){
-		return "[Pokemon="+metadata.toString()+"]";
+		return "PokeRecipeConditionIngredient{"+
+				"defaultMetadata="+defaultMetadata+
+				", overrideMetadata="+overrideMetadata+
+				'}';
 	}
 }
