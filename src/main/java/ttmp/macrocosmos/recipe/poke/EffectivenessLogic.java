@@ -1,11 +1,11 @@
-package ttmp.macrocosmos.util;
+package ttmp.macrocosmos.recipe.poke;
 
 import com.pixelmonmod.pixelmon.enums.EnumType;
 
 import java.util.List;
 
 @FunctionalInterface
-public interface EffectivenessCalculationLogic{
+public interface EffectivenessLogic{
 	/**
 	 * @return Effectiveness of the attack against provided type of pokemon.<br>
 	 * Return value of 0 indicates the attack is completely nullified.<br>

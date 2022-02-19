@@ -3,7 +3,6 @@ package ttmp.macrocosmos.recipe.poke;
 import com.pixelmonmod.pixelmon.enums.EnumType;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
 import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
-import ttmp.macrocosmos.util.PokeRecipeWorkType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

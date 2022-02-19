@@ -1,9 +1,10 @@
-package ttmp.macrocosmos.util;
+package ttmp.macrocosmos.recipe.poke;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
+import ttmp.macrocosmos.util.BitMask;
 
 import java.util.List;
 

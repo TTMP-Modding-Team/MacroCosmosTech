@@ -5,7 +5,6 @@ import net.minecraft.item.crafting.Ingredient;
 import ttmp.macrocosmos.capability.Caps;
 import ttmp.macrocosmos.item.ModItems;
 import ttmp.macrocosmos.mte.trait.PokemonRecipeLogic;
-import ttmp.macrocosmos.util.PokeRecipeMatch;
 
 import javax.annotation.Nullable;
 

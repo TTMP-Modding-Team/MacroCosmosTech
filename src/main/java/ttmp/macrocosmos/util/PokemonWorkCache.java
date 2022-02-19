@@ -6,6 +6,8 @@ import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import ttmp.macrocosmos.mte.trait.PokemonRecipeLogic;
+import ttmp.macrocosmos.recipe.poke.AbilityBasedEffectivenessLogic;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeWorkType;
 
 public class PokemonWorkCache{
 	private final PokemonRecipeLogic logic;
@@ -42,7 +44,7 @@ public class PokemonWorkCache{
 		if(hp<=0) return 0;
 		PokeRecipeWorkType workType = logic.getDefaultMetadata().getWorkType(logic.getRecipeMetadata());
 		float averageEffectiveness = workType.getAverageEffectiveness(
-				pokemon.getBaseStats().getTypeList(), EnumEffectivenessCalculationLogic.get(pokemon));
+				pokemon.getBaseStats().getTypeList(), AbilityBasedEffectivenessLogic.get(pokemon));
 		if(averageEffectiveness==0) return requiredWork;
 
 		if(averageEffectiveness>0){

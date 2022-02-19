@@ -8,7 +8,6 @@ import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
 import ttmp.macrocosmos.util.BitMask;
 import ttmp.macrocosmos.util.ByteSerializable;
 import ttmp.macrocosmos.util.CombinedList;
-import ttmp.macrocosmos.util.PokeRecipeWorkType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

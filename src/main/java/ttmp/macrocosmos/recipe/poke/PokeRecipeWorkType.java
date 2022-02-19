@@ -1,7 +1,8 @@
-package ttmp.macrocosmos.util;
+package ttmp.macrocosmos.recipe.poke;
 
 import com.pixelmonmod.pixelmon.enums.EnumType;
 import net.minecraft.network.PacketBuffer;
+import ttmp.macrocosmos.util.ByteSerializable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,7 +55,7 @@ public final class PokeRecipeWorkType implements ByteSerializable{
 	}
 
 
-	public float getAverageEffectiveness(List<EnumType> types, EffectivenessCalculationLogic calculationLogic){
+	public float getAverageEffectiveness(List<EnumType> types, EffectivenessLogic calculationLogic){
 		if(entries.isEmpty()) return 1;
 		double avgEffectiveness = 0;
 		for(Entry e : entries)

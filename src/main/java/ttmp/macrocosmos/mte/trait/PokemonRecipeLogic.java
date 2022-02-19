@@ -27,7 +27,7 @@ import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadata;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeSkillBonus;
 import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
 import ttmp.macrocosmos.util.ActivePokemonSkillBonuses;
-import ttmp.macrocosmos.util.PokeRecipeMatch;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeMatch;
 import ttmp.macrocosmos.util.PokemonWorkCache;
 
 import javax.annotation.Nonnull;

@@ -1,11 +1,11 @@
-package ttmp.macrocosmos.util;
+package ttmp.macrocosmos.recipe.poke;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumType;
 
 import java.util.List;
 
-public enum EnumEffectivenessCalculationLogic implements EffectivenessCalculationLogic{
+public enum AbilityBasedEffectivenessLogic implements EffectivenessLogic{
 	DEFAULT,
 	FILTER{
 		@Override public float getEffectiveness(List<EnumType> types, EnumType attackType){
@@ -94,7 +94,7 @@ public enum EnumEffectivenessCalculationLogic implements EffectivenessCalculatio
 		return EnumType.getTotalEffectiveness(types, attackType);
 	}
 
-	public static EnumEffectivenessCalculationLogic get(Pokemon pokemon){
+	public static AbilityBasedEffectivenessLogic get(Pokemon pokemon){
 		switch(pokemon.getAbility().getName()){
 			case "Filter":
 				return FILTER;
