@@ -1,26 +1,25 @@
 package ttmp.macrocosmos.gui.widget;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
-import com.pixelmonmod.pixelmon.api.storage.StoragePosition;
+import com.pixelmonmod.pixelmon.api.storage.PCStorage;
 import com.pixelmonmod.pixelmon.client.storage.ClientStorageManager;
 import gregtech.api.gui.resources.IGuiTexture;
-import ttmp.macrocosmos.capability.PokemonContainer;
+import ttmp.macrocosmos.gui.widget.PokemonSlotController.PokemonSlotInterface;
 
 import javax.annotation.Nullable;
 
 public class PCPokemonSlot extends PokemonSlot{
-		private final PokemonContainer container;
-		private final PokemonBoxSlotController controller;
-		private final int index;
+	private final PokemonBoxSlotController controller;
+	private final int index;
 
-		public PCPokemonSlot(PokemonSlotController.PokemonSlotInterface slotInterface, int x, int y, PokemonContainer container, PokemonBoxSlotController controller, int index, IGuiTexture... slotTextures){
-			super(slotInterface, x, y, slotTextures);
-			this.index = index;
-			this.container = container;
-			this.controller = controller;
-		}
+	public PCPokemonSlot(PokemonSlotInterface slotInterface, int x, int y, PokemonBoxSlotController controller, int index, IGuiTexture... slotTextures){
+		super(slotInterface, x, y, slotTextures);
+		this.controller = controller;
+		this.index = index;
+	}
 
-		@Nullable @Override public Pokemon getPokemonForRender(){
-			return ClientStorageManager.pcs.get(controller.getPcUUID()).get(index/30, index%30);
-		}
+	@Nullable @Override public Pokemon getPokemonForRender(){
+		PCStorage pc = ClientStorageManager.pcs.get(controller.getPcUUID());
+		return pc!=null ? pc.get(controller.getBoxIndex(), index) : null;
+	}
 }

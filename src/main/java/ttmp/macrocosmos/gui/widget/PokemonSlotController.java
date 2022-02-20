@@ -13,12 +13,12 @@ import java.util.List;
 import static ttmp.macrocosmos.util.PokemonContainerUtil.*;
 
 public class PokemonSlotController extends Widget{
-	public static final int MOVE = 0;
-	public static final int QUICK_MOVE = 1;
+	private static final int MOVE = 0;
+	private static final int QUICK_MOVE = 1;
 
 	protected final List<SlotData> slot = new ArrayList<>();
 
-	@Nullable private Integer selectedSlot;
+	@Nullable protected Integer selectedSlot;
 
 	public PokemonSlotController(){
 		super(0, 0, 0, 0);
@@ -30,15 +30,17 @@ public class PokemonSlotController extends Widget{
 	}
 
 	public PokemonSlot newContainerSlot(int x, int y, PokemonContainer container, int index, IGuiTexture... slotTextures){
-		PokemonSlotInterface i = new PokemonSlotInterface(slot.size());
-		slot.add(new SlotData(container, index, false));
-		return new ContainerPokemonSlot(i, x, y, container, index, slotTextures);
+		return new ContainerPokemonSlot(registerNewSlot(container,index), x, y, container, index, slotTextures);
 	}
 
 	public PokemonSlot newPartySlot(int x, int y, EntityPlayer player, int index, IGuiTexture... slotTextures){
+		return new PartyPokemonSlot(registerNewSlot(getParty(player), index), x, y, index, slotTextures);
+	}
+
+	protected PokemonSlotInterface registerNewSlot(PokemonContainer container, int index){
 		PokemonSlotInterface i = new PokemonSlotInterface(slot.size());
-		slot.add(new SlotData(getParty(player), index, true));
-		return new PartyPokemonSlot(i, x, y, index, slotTextures);
+		slot.add(new SlotData(container, index, true));
+		return i;
 	}
 
 	@Override public void handleClientAction(int id, PacketBuffer buffer){
@@ -69,6 +71,28 @@ public class PokemonSlotController extends Widget{
 		else return null;
 	}
 
+	protected void selectSlot(int selectedSlot){
+		this.selectedSlot = selectedSlot;
+	}
+
+	protected void performMove(int selectedSlot){
+		if(this.selectedSlot==null) return;
+		if(selectedSlot!=this.selectedSlot)
+			writeClientAction(MOVE, buffer -> buffer
+					.writeVarInt(this.selectedSlot)
+					.writeVarInt(selectedSlot));
+		this.selectedSlot = null;
+	}
+
+	protected void performQuickMove(int selectedSlot){
+		writeClientAction(QUICK_MOVE, buffer -> buffer.writeVarInt(selectedSlot));
+		this.selectedSlot = null;
+	}
+
+	protected boolean isSlotSelected(int slot){
+		return selectedSlot!=null&&selectedSlot==slot;
+	}
+
 	protected static final class SlotData{
 		public final PokemonContainer container;
 		public final int index;
@@ -89,21 +113,16 @@ public class PokemonSlotController extends Widget{
 		}
 
 		public void select(){
-			if(selectedSlot==null) selectedSlot = id;
-			else{
-				if(selectedSlot!=id)
-					writeClientAction(MOVE, buffer -> buffer.writeVarInt(selectedSlot).writeVarInt(id));
-				selectedSlot = null;
-			}
+			if(selectedSlot==null) selectSlot(id);
+			else performMove(id);
 		}
 
 		public void quickMove(){
-			writeClientAction(QUICK_MOVE, buffer -> buffer.writeVarInt(id));
-			selectedSlot = null;
+			performQuickMove(id);
 		}
 
 		public boolean isSelected(){
-			return selectedSlot!=null&&selectedSlot==id;
+			return isSlotSelected(id);
 		}
 	}
 }

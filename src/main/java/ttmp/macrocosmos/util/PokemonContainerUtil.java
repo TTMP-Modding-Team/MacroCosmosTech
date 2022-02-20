@@ -1,11 +1,8 @@
 package ttmp.macrocosmos.util;
 
-import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import ttmp.macrocosmos.capability.EmptyPokemonContainer;
-import ttmp.macrocosmos.capability.PCPokemonContainer;
 import ttmp.macrocosmos.capability.PlayerPartyContainer;
 import ttmp.macrocosmos.capability.PokemonContainer;
 
@@ -16,10 +13,6 @@ import java.util.UUID;
 public class PokemonContainerUtil{
 	public static PokemonContainer getParty(EntityPlayer player){
 		return player.world.isRemote ? EmptyPokemonContainer.EMPTY : new PlayerPartyContainer(player);
-	}
-
-	public static PokemonContainer getPC(EntityPlayer player) {
-		return player.world.isRemote ? EmptyPokemonContainer.EMPTY : new PCPokemonContainer(Pixelmon.storageManager.getPCForPlayer(player.getUniqueID()));
 	}
 
 	public static int firstEmptySlot(PokemonContainer container){
