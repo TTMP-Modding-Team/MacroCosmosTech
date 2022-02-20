@@ -2,6 +2,7 @@ package ttmp.macrocosmos.recipe.poke.condition;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.translation.I18n;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
 import ttmp.macrocosmos.combeekeeping.CombeeTypes;
 import ttmp.macrocosmos.mte.trait.ApiaryLogic;
@@ -33,7 +34,13 @@ public class Vespiquen implements PokemonCondition{
 		if(combeeType!=null) buffer.writeString(combeeType.getName());
 	}
 
+	@SuppressWarnings("deprecation") @Override public String localize(){
+		return combeeType!=null ?
+				I18n.translateToLocalFormatted("pokemon_condition.macrocosmos.vespiquen.type", combeeType.getLocalizedName()) :
+				I18n.translateToLocal("pokemon_condition.macrocosmos.vespiquen");
+	}
+
 	@Override public String toString(){
-		return (combeeType!=null ? "Vespiquen="+combeeType.getName() : "Vespiquen");
+		return combeeType!=null ? combeeType.getName()+" Vespiquen" : "Vespiquen";
 	}
 }

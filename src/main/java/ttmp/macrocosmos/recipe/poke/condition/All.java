@@ -32,6 +32,10 @@ public class All extends MultipleCondition{
 		return Types.ALL;
 	}
 
+	@Override protected String delimiterLocalizationKey(){
+		return "pokemon_condition.macrocosmos.all.delimiter";
+	}
+
 	@Override protected String delimiter(){
 		return " and ";
 	}

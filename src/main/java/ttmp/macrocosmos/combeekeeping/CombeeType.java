@@ -1,5 +1,7 @@
 package ttmp.macrocosmos.combeekeeping;
 
+import net.minecraft.util.text.translation.I18n;
+
 import java.util.Objects;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
@@ -20,6 +22,10 @@ public final class CombeeType{
 
 	public String translationKey(){
 		return "name."+MODID+".combee_type."+name;
+	}
+
+	@SuppressWarnings("deprecation") public String getLocalizedName(){
+		return I18n.translateToLocal(translationKey());
 	}
 
 	public double getMaxEggProduction(){

@@ -1,0 +1,15 @@
+name.macrocosmos.combee_type.normal=Normal
+name.macrocosmos.combee_type.morph_test=Morph Test
+name.macrocosmos.combee_type.morph_test_2=Morph Test 2
+
+pokemon_condition.macrocosmos.always=Any Pokemon
+pokemon_condition.macrocosmos.never=Never
+pokemon_condition.macrocosmos.not=Not %s
+pokemon_condition.macrocosmos.all.delimiter=%s and %s
+pokemon_condition.macrocosmos.or.delimiter=%s or %s
+pokemon_condition.macrocosmos.type=%s Type
+pokemon_condition.macrocosmos.vespiquen=Vespiquen
+pokemon_condition.macrocosmos.vespiquen.type=%s Vespiquen
+pokemon_condition.macrocosmos.combee_type=%s Combee
+pokemon_condition.macrocosmos.egg=Egg
+pokemon_condition.macrocosmos.not_egg=Not Egg

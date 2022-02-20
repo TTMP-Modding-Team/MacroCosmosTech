@@ -13,7 +13,7 @@ import ttmp.macrocosmos.mte.ModMetaTileEntities;
 @Mod(modid = MacroCosmosMod.MODID,
 		name = MacroCosmosMod.NAME,
 		version = MacroCosmosMod.VERSION,
-		dependencies = "required:gregtech@[2,);required:pixelmon;")
+		dependencies = "required:gregtech@[2,);required-after:pixelmon;")
 public class MacroCosmosMod{
 	public static final String MODID = "macrocosmos";
 	public static final String NAME = "Macro Cosmos Tech";

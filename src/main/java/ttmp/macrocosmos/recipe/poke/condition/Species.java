@@ -27,7 +27,11 @@ public class Species implements PokemonCondition{
 		buffer.writeVarInt(species.getNationalPokedexInteger());
 	}
 
+	@Override public String localize(){
+		return species.getLocalizedName();
+	}
+
 	@Override public String toString(){
-		return "Species="+species;
+		return species.toString();
 	}
 }

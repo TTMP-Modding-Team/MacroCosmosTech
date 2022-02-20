@@ -11,6 +11,8 @@ import ttmp.macrocosmos.util.TypedSerializable;
 import java.util.function.Predicate;
 
 public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
+	String localize();
+
 	static PokemonCondition always(){
 		return Always.ALWAYS;
 	}
@@ -48,7 +50,7 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 		return new Vespiquen(type);
 	}
 	static PokemonCondition combeeType(CombeeType type){
-		return new Combee(type);
+		return new CombeeTypeCondition(type);
 	}
 
 	static PokemonCondition readCondition(byte[] bytes){
@@ -76,8 +78,8 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 				return Always.ALWAYS;
 			case Types.NEVER:
 				return Never.NEVER;
-			case Types.COMBEE:
-				return Combee.read(buffer);
+			case Types.COMBEE_TYPE:
+				return CombeeTypeCondition.read(buffer);
 		}
 		return null;
 	}
@@ -96,6 +98,6 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 		byte SPECIES = 7;
 		byte TYPE = 8;
 		byte VESPIQUEN = 9;
-		byte COMBEE = 10;
+		byte COMBEE_TYPE = 10;
 	}
 }

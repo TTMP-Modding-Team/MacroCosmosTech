@@ -3,6 +3,7 @@ package ttmp.macrocosmos.recipe.poke.condition;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.enums.EnumType;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.text.translation.I18n;
 
 public class Type implements PokemonCondition{
 	public static PokemonCondition read(PacketBuffer buffer){
@@ -27,7 +28,11 @@ public class Type implements PokemonCondition{
 		buffer.writeByte(type.getIndex());
 	}
 
+	@SuppressWarnings("deprecation") @Override public String localize(){
+		return I18n.translateToLocalFormatted("pokemon_condition.macrocosmos.type", type.getLocalizedName());
+	}
+
 	@Override public String toString(){
-		return "Type="+type;
+		return type+" Type";
 	}
 }

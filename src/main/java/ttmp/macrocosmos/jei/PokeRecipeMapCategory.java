@@ -95,7 +95,7 @@ public class PokeRecipeMapCategory extends RecipeMapCategory{
 
 		pokemonInputGroup.addTooltipCallback((slotIndex, input, ingredient, tooltip) -> {
 			PokemonCondition pokemonCondition = prw.getPokemonConditions().get(slotIndex);
-			tooltip.add(TextFormatting.YELLOW+"Condition: "+(pokemonCondition!=null ? pokemonCondition.toString() : "??? ???? ??"));
+			tooltip.add(TextFormatting.YELLOW+"Condition: "+(pokemonCondition!=null ? pokemonCondition.localize() : "??? ???? ??"));
 		});
 		pokemonInputGroup.set(ingredients);
 	}
