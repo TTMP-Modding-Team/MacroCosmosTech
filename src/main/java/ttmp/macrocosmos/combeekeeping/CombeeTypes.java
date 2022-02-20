@@ -17,9 +17,9 @@ public class CombeeTypes{
 	private static final Map<String, CombeeType> combeeTypes = new HashMap<>();
 	private static final List<CombeeMorph> morphs = new ArrayList<>();
 
-	public static final CombeeType NORMAL = new CombeeType("normal", 10000);
-	public static final CombeeType MORPH_TEST = new CombeeType("morph_test", 10000);
-	public static final CombeeType MORPH_TEST_2 = new CombeeType("morph_test_2", 10000);
+	public static final CombeeType NORMAL = new CombeeType("normal", 1000);
+	public static final CombeeType MORPH_TEST = new CombeeType("morph_test", 1000);
+	public static final CombeeType MORPH_TEST_2 = new CombeeType("morph_test_2", 1000);
 
 	public static final CombeeMorph NORMAL_TO_MORPH_TEST = CombeeMorph.eggOf(combeeType(NORMAL), combeeType(MORPH_TEST)).chance(.5).into(MORPH_TEST);
 	private static final String COMBEE_TYPE_KEY = MODID+".combeeType";

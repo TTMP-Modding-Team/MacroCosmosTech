@@ -43,7 +43,7 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		this.eggs = eggs;
 	}
 
-	@Nullable private Pokemon queen(){
+	@Nullable public Pokemon queen(){
 		return queen.getPokemon(0);
 	}
 
