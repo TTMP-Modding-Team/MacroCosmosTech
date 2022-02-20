@@ -13,3 +13,6 @@ pokemon_condition.macrocosmos.vespiquen.type=%s Vespiquen
 pokemon_condition.macrocosmos.combee_type=%s Combee
 pokemon_condition.macrocosmos.egg=Egg
 pokemon_condition.macrocosmos.not_egg=Not Egg
+
+tooltip.macrocosmos.pokemon.holding=Holding %s
+recipe_category.macrocosmos.combee_morph=Combee Morph

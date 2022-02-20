@@ -1,4 +1,4 @@
-package ttmp.macrocosmos.jei;
+package ttmp.macrocosmos.jei.poke;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import gregtech.api.recipes.CountableIngredient;
@@ -13,6 +13,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
 import net.minecraft.item.ItemStack;
+import ttmp.macrocosmos.jei.MacroCosmosJeiPlugin;
+import ttmp.macrocosmos.jei.ingredient.PreviewPokemonFactory;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeConditionIngredient;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
 

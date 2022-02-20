@@ -1,4 +1,4 @@
-package ttmp.macrocosmos.jei;
+package ttmp.macrocosmos.jei.poke;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import gregtech.api.gui.BlankUIHolder;
@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.items.ItemStackHandler;
 import ttmp.macrocosmos.MacroCosmosMod;
+import ttmp.macrocosmos.jei.MacroCosmosJeiPlugin;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
 
 import javax.annotation.Nonnull;

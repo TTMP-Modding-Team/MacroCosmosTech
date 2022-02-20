@@ -31,6 +31,15 @@ public final class CombeeMorph{
 				(checkForReverseCase&&this.worker.test(queen)&&this.queen.test(worker));
 	}
 
+	public PokemonCondition getQueenCondition(){
+		return queen;
+	}
+	public PokemonCondition getWorkerCondition(){
+		return worker;
+	}
+	public boolean checkForReverseCase(){
+		return checkForReverseCase;
+	}
 	public double getChance(){
 		return chance;
 	}

@@ -1,4 +1,4 @@
-package ttmp.macrocosmos.jei;
+package ttmp.macrocosmos.jei.ingredient;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import mezz.jei.api.ingredients.IIngredientHelper;

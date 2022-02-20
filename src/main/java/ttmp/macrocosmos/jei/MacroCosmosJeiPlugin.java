@@ -10,6 +10,14 @@ import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IIngredientType;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
+import ttmp.macrocosmos.combeekeeping.CombeeTypes;
+import ttmp.macrocosmos.jei.combee_morph.CombeeMorphRecipeCategory;
+import ttmp.macrocosmos.jei.combee_morph.CombeeMorphRecipeWrapper;
+import ttmp.macrocosmos.jei.ingredient.PokemonIngredientHelper;
+import ttmp.macrocosmos.jei.ingredient.PokemonIngredientRenderer;
+import ttmp.macrocosmos.jei.ingredient.PreviewPokemonFactory;
+import ttmp.macrocosmos.jei.poke.PokeRecipeMapCategory;
+import ttmp.macrocosmos.jei.poke.PokeRecipeWrapper;
 import ttmp.macrocosmos.recipe.ModRecipes;
 
 import java.util.Collection;
@@ -27,10 +35,17 @@ public class MacroCosmosJeiPlugin implements IModPlugin{
 	@Override public void registerCategories(IRecipeCategoryRegistration registry){
 		registerRecipeCategories(registry, ModRecipes.COMBEE);
 		registerRecipeCategories(registry, ModRecipes.TEST_1);
+
+		registry.addRecipeCategories(new CombeeMorphRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
 	}
 	@Override public void register(IModRegistry registry){
 		registerRecipes(registry, ModRecipes.COMBEE);
 		registerRecipes(registry, ModRecipes.TEST_1);
+
+		registry.addRecipes(CombeeTypes.getMorphs().stream()
+						.map(CombeeMorphRecipeWrapper::new)
+						.collect(Collectors.toList()),
+				CombeeMorphRecipeCategory.UID);
 	}
 
 	private void registerRecipeCategories(IRecipeCategoryRegistration registry, RecipeMap<?> recipeMap){

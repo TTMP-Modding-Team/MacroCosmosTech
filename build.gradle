@@ -93,3 +93,10 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
+jar {
+    manifest {
+        attributes 'FMLCorePlugin': 'ttmp.macrocosmos.coremod.MacroCosmosLoadingPlugin'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
+    }
+}

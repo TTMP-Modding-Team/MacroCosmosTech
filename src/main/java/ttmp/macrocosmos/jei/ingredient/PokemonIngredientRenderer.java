@@ -1,4 +1,4 @@
-package ttmp.macrocosmos.jei;
+package ttmp.macrocosmos.jei.ingredient;
 
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import com.pixelmonmod.pixelmon.client.gui.GuiHelper;
@@ -6,9 +6,9 @@ import mezz.jei.api.ingredients.IIngredientRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.util.ITooltipFlag;
+import ttmp.macrocosmos.client.PokemonHoverTooltip;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 public class PokemonIngredientRenderer implements IIngredientRenderer<Pokemon>{
@@ -22,6 +22,6 @@ public class PokemonIngredientRenderer implements IIngredientRenderer<Pokemon>{
 	}
 
 	@Override public List<String> getTooltip(Minecraft minecraft, Pokemon pokemon, ITooltipFlag tooltipFlag){
-		return Collections.singletonList(pokemon.getDisplayName());
+		return PokemonHoverTooltip.getPokemonTooltip(pokemon);
 	}
 }
