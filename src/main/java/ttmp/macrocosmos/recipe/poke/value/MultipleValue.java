@@ -8,6 +8,7 @@ public abstract class MultipleValue implements PokemonValue{
 	public MultipleValue(PokemonValue... values){
 		this.values = values;
 	}
+
 	public MultipleValue(PacketBuffer buffer){
 		this.values = new PokemonValue[buffer.readVarInt()];
 		for(int i = 0; i<this.values.length; i++)

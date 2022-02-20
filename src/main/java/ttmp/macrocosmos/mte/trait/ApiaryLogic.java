@@ -11,8 +11,6 @@ import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.combeekeeping.CombeeType;
 import ttmp.macrocosmos.combeekeeping.CombeeTypes;
 import ttmp.macrocosmos.recipe.ModRecipes;
-import ttmp.macrocosmos.recipe.poke.PokeRecipeSkillBonus;
-import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
 import ttmp.macrocosmos.util.ActivePokemonSkillBonuses;
 import ttmp.macrocosmos.util.PokemonContainerUtil;
 import ttmp.macrocosmos.util.PokemonWorkCache;
@@ -22,7 +20,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import static ttmp.macrocosmos.MacroCosmosMod.MODID;
@@ -102,24 +99,21 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 		}
 	}
 
-	@Override protected boolean canProgressRecipe(){
-		if(!super.canProgressRecipe()) return false;
-		Pokemon queen = queen();
-		if(queen!=null&&isValidQueen(queen)&&queen.getHealth()>0){
-			for(int i = 0; i<workers.size(); i++){
-				Pokemon worker = workers.getPokemon(i);
-				if(worker!=null&&isValidWorker(worker)&&worker.getHealth()>0)
-					return true;
-			}
-		}
-		return false;
-	}
-
 	@Override protected RecipeHaltBehavior getRecipeHaltBehavior(){
 		return RecipeHaltBehavior.KEEP_PROGRESS;
 	}
 
 	@Override protected boolean progress(){
+		boolean hasWorker = false;
+		for(int i = 0; i<workers.size(); i++){
+			Pokemon worker = workers.getPokemon(i);
+			if(worker!=null&&isValidWorker(worker)&&worker.getHealth()>0){
+				hasWorker = true;
+				break;
+			}
+		}
+		if(!hasWorker) return false;
+
 		if(super.progress()){
 			Pokemon queen = queen();
 			if(queen!=null&&PokemonContainerUtil.hasEmptySlot(eggs))
@@ -129,24 +123,23 @@ public class ApiaryLogic extends PokemonRecipeLogic{
 	}
 
 	@Override protected float workToProgress(){
-		Pokemon queen = queen();
-		if(queen==null||queen.getHealth()<=0) return 0;
+		float workToProgress = super.workToProgress();
+		if(workToProgress<=0) return 0;
 
-		PokemonValue progressValue = defaultMetadata.getProgress(recipeMetadata);
-		Set<PokeRecipeSkillBonus> skillBonus = defaultMetadata.getSkillBonus(recipeMetadata);
-		float progress = this.workCache.consumeWork(0, queen, progressValue.getValue(queen))
-				*this.skillBonuses.getSkillBonus(0, queen, skillBonus);
+		Pokemon queen = queen();
+		if(queen==null) return workToProgress;
 		CombeeType queenType = CombeeTypes.getCombeeType(queen);
+
 		for(int i = 0; i<this.workers.size(); i++){
 			Pokemon worker = this.workers.getPokemon(i);
-			if(worker!=null&&isValidWorker(worker)&&worker.getHealth()<=0){
-				progress += this.combeeWorkCache.consumeWork(i, worker,
-						progressValue.getValue(worker)/
-								(CombeeTypes.getCombeeType(worker)==queenType ? 2 : 3))
-						*this.combeeSkillBonuses.getSkillBonus(i, worker, skillBonus);
+			if(worker!=null&&isValidWorker(worker)&&worker.getHealth()>0){
+				workToProgress += this.combeeWorkCache.consumeWork(i, worker,
+						getRecipeProgress().getValue(worker)*overclockPercentage/
+								(CombeeTypes.getCombeeType(worker)==queenType ? 2 : 3))/overclockPercentage
+						*this.combeeSkillBonuses.getSkillBonus(i, worker, getRecipeSkillBonus());
 			}
 		}
-		return progress;
+		return workToProgress;
 	}
 
 	public double getEggProgressPercentage(){

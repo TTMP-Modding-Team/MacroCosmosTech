@@ -41,7 +41,7 @@ public class ActivePokemonSkillBonuses{
 	}
 
 	public float getSkillBonus(int index, Pokemon pokemon, Collection<PokeRecipeSkillBonus> skillBonuses){
-		float skillBonusSum = 0;
+		float skillBonusSum = 1;
 		Map<String, Entry> m = this.entries.get(index);
 		for(PokeRecipeSkillBonus skillBonus : skillBonuses){
 			if(m!=null){
@@ -103,6 +103,25 @@ public class ActivePokemonSkillBonuses{
 				m.put(s, new Entry(tag.getCompoundTag(s)));
 			}
 		}
+	}
+
+	@Override public String toString(){
+		StringBuilder stb = new StringBuilder("ActivePokemonSkillBonuses{");
+		boolean first = true;
+		for(Int2ObjectMap.Entry<Map<String, Entry>> e : entries.int2ObjectEntrySet()){
+			if(e.getValue().isEmpty()) continue;
+			if(first) first = false;
+			else stb.append(", ");
+			stb.append(e.getIntKey()).append(":").append("{");
+			boolean first2 = true;
+			for(Map.Entry<String, Entry> e2 : e.getValue().entrySet()){
+				if(first2) first2 = false;
+				else stb.append(", ");
+				stb.append(e2.getKey()).append(":").append(e2.getValue());
+			}
+			stb.append("}");
+		}
+		return stb.append("}").toString();
 	}
 
 	public static final class Entry{

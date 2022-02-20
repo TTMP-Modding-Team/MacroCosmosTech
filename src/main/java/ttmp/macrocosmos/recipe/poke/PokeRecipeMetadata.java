@@ -2,6 +2,7 @@ package ttmp.macrocosmos.recipe.poke;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.pixelmonmod.pixelmon.entities.pixelmon.stats.StatsType;
 import net.minecraft.network.PacketBuffer;
 import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
 import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
@@ -15,12 +16,39 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static ttmp.macrocosmos.recipe.poke.value.PokemonValue.*;
+
 public final class PokeRecipeMetadata implements ByteSerializable{
+	// HP is omitted because they already contribute to operation and it uses different formula for calculation
+	// defence stats were also omitted because they already contribute to operation
+	private static final PokemonValue defaultProgress = mul(
+			div(
+					constant(600),
+					sum(constant(500), stat(StatsType.Attack, StatsType.SpecialAttack, StatsType.Speed))
+			),
+			sum(
+					degradation(),
+					ability()
+			)
+	);
+	public static PokemonValue defaultProgress(){
+		return defaultProgress;
+	}
+
+	public static final PokemonValue defaultHpToWorkConversionRate = div(
+			constant(4000),
+			sum(
+					constant(200),
+					stat(StatsType.Defence, StatsType.SpecialDefence)
+			)
+	);
+	public static PokemonValue defaultHpToWorkConversionRate(){
+		return defaultHpToWorkConversionRate;
+	}
+
 	private static final class DefaultMetadataHolder{
 		private static final PokeRecipeMetadata defaultMetadata = builder().build();
 	}
-
-	private static final PokemonValue DEFAULT_HP_TO_WORK_CONVERSION_RATE = PokemonValue.constant(20);
 
 	public static PokeRecipeMetadata defaultMetadata(){
 		return DefaultMetadataHolder.defaultMetadata;
@@ -105,23 +133,20 @@ public final class PokeRecipeMetadata implements ByteSerializable{
 
 	public PokemonValue getHpToWorkConversionRate(@Nullable PokeRecipeMetadata override){
 		return override!=null&&override.getHpToWorkConversionRate()!=null ?
-				override.getHpToWorkConversionRate() :
-				getHpToWorkConversionRate()!=null ?
-						getHpToWorkConversionRate() : DEFAULT_HP_TO_WORK_CONVERSION_RATE;
+				override.getHpToWorkConversionRate() : getHpToWorkConversionRate()!=null ?
+				getHpToWorkConversionRate() : defaultHpToWorkConversionRate();
 	}
 
 	public PokeRecipeWorkType getWorkType(@Nullable PokeRecipeMetadata override){
 		return override!=null&&override.getWorkType()!=null ?
-				override.getWorkType() :
-				this.getWorkType()!=null ?
-						this.getWorkType() : PokeRecipeWorkType.defaultWorkType();
+				override.getWorkType() : this.getWorkType()!=null ?
+				this.getWorkType() : PokeRecipeWorkType.defaultWorkType();
 	}
 
 	public PokemonValue getProgress(@Nullable PokeRecipeMetadata override){
 		return override!=null&&override.getProgress()!=null ?
-				override.getProgress() :
-				getProgress()!=null ?
-						getProgress() : PokemonValue.one();
+				override.getProgress() : getProgress()!=null ?
+				getProgress() : defaultProgress();
 	}
 
 	public Set<PokeRecipeSkillBonus> getSkillBonus(@Nullable PokeRecipeMetadata override){
@@ -147,9 +172,9 @@ public final class PokeRecipeMetadata implements ByteSerializable{
 		if(this.workType!=null) this.workType.write(buffer);
 		if(this.progress!=null) this.progress.write(buffer);
 
+		buffer.writeVarInt(this.skillBonus.size());
 		for(PokeRecipeSkillBonus b : this.skillBonus)
 			b.write(buffer);
-
 	}
 
 	@Override public String toString(){

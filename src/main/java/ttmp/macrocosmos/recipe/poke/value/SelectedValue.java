@@ -22,15 +22,18 @@ public class SelectedValue implements PokemonValue{
 		return (condition.test(pokemon) ? onTrue : onFalse)
 				.getValue(pokemon);
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){
 		condition.write(buffer);
 		onTrue.writeAdditional(buffer);
 		onFalse.writeAdditional(buffer);
 	}
-	@Override public String toString(){
-		return "{["+condition+"] ? "+onTrue +" : "+onFalse+"}";
-	}
+
 	@Override public byte type(){
 		return Types.SELECT;
+	}
+
+	@Override public String toString(){
+		return "{["+condition+"] ? "+onTrue +" : "+onFalse+"}";
 	}
 }

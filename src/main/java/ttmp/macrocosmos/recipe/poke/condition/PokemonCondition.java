@@ -20,6 +20,12 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 	static PokemonCondition all(PokemonCondition... conditions){
 		return All.of(conditions);
 	}
+	/**
+	 * @deprecated Did you mean {@link PokemonCondition#always() always}?
+	 */
+	static PokemonCondition any(){
+		return never();
+	}
 	static PokemonCondition any(PokemonCondition... conditions){
 		return Any.of(conditions);
 	}
@@ -38,7 +44,7 @@ public interface PokemonCondition extends TypedSerializable, Predicate<Pokemon>{
 	static PokemonCondition type(EnumType type){
 		return new Type(type);
 	}
-	static PokemonCondition queen(CombeeType type){
+	static PokemonCondition vespiquen(CombeeType type){
 		return new Vespiquen(type);
 	}
 	static PokemonCondition combeeType(CombeeType type){

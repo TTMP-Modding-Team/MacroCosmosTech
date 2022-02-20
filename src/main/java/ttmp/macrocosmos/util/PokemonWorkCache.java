@@ -29,7 +29,7 @@ public class PokemonWorkCache{
 	public float consumeWork(int index, Pokemon pokemon, float workToConsume){
 		float w = works.get(index);
 		if(w<workToConsume){
-			w += drawWork(pokemon, w-workToConsume);
+			w += drawWork(pokemon, workToConsume-w);
 			if(w<workToConsume){
 				works.remove(index);
 				return w;
@@ -40,9 +40,9 @@ public class PokemonWorkCache{
 	}
 
 	protected float drawWork(Pokemon pokemon, float requiredWork){
-		float hp = logic.getDefaultMetadata().getHpToWorkConversionRate(logic.getRecipeMetadata()).getValue(pokemon);
+		float hp = logic.getRecipeHpToWorkConversionRate().getValue(pokemon);
 		if(hp<=0) return 0;
-		PokeRecipeWorkType workType = logic.getDefaultMetadata().getWorkType(logic.getRecipeMetadata());
+		PokeRecipeWorkType workType = logic.getRecipeWorkType();
 		float averageEffectiveness = workType.getAverageEffectiveness(
 				pokemon.getBaseStats().getTypeList(), AbilityBasedEffectivenessLogic.get(pokemon));
 		if(averageEffectiveness==0) return requiredWork;

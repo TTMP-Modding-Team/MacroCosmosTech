@@ -22,6 +22,7 @@ public class MulValue extends MultipleValue{
 			sum *= e.getValue(pokemon);
 		return sum;
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){
 		buffer.writeVarInt(values.length);
 		for(PokemonValue work : values)

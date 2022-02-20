@@ -64,9 +64,9 @@ dependencies {
     deobfCompile "codechicken-lib-1-8:CodeChickenLib-1.12.2:3.2.3.358:universal"
 
     // compile against the JEI API but do not include it at runtime
-    compileOnly "mezz.jei:jei_1.12.2:4.15.0.268:api"
+    // compileOnly "mezz.jei:jei_1.12.2:4.15.0.268:api"
     // at runtime, use the full JEI jar
-    runtimeOnly "mezz.jei:jei_1.12.2:4.15.0.268"
+    compile "mezz.jei:jei_1.12.2:4.15.0.268"
 
     compile "crafttweaker:CraftTweaker2:1.12:4.1.20.674"
 

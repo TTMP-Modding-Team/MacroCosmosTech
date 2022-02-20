@@ -18,9 +18,11 @@ public class EffectivenessValue implements PokemonValue{
 	@Override public float getValue(Pokemon pokemon){
 		return EnumType.getTotalEffectiveness(pokemon.getBaseStats().getTypeList(), attackType);
 	}
+
 	@Override public byte type(){
 		return Types.EFFECTIVENESS;
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){
 		buffer.writeByte(attackType.getIndex());
 	}

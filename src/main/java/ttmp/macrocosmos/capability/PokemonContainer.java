@@ -4,6 +4,7 @@ import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
 import net.minecraft.entity.player.EntityPlayer;
 import ttmp.macrocosmos.util.Transaction;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,6 +15,7 @@ public interface PokemonContainer{
 	@Nullable Pokemon getPokemon(int index);
 	@Nullable UUID getOwnerId(int index);
 
+	@CheckReturnValue
 	Transaction setPokemon(int index, @Nullable Pokemon pokemon, @Nullable UUID ownerId);
 
 	boolean isValid(Pokemon pokemon, int index);
@@ -29,9 +31,11 @@ public interface PokemonContainer{
 		return ownerId==null||Objects.equals(ownerId, id);
 	}
 
+	@CheckReturnValue
 	default Transaction setPokemon(int index, @Nullable Pokemon pokemon, @Nullable EntityPlayer owner){
 		return setPokemon(index, pokemon, owner!=null ? owner.getUniqueID() : null);
 	}
+	@CheckReturnValue
 	default Transaction setPokemonEmpty(int index){
 		return setPokemon(index, null, (UUID)null);
 	}

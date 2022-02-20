@@ -20,14 +20,17 @@ public class ConditionedValue implements PokemonValue{
 	@Override public float getValue(Pokemon pokemon){
 		return condition.test(pokemon) ? work.getValue(pokemon) : 0;
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){
 		condition.write(buffer);
 		work.writeAdditional(buffer);
 	}
-	@Override public String toString(){
-		return "{["+condition+"] => "+work+"}";
-	}
+
 	@Override public byte type(){
 		return Types.CONDITION;
+	}
+
+	@Override public String toString(){
+		return "{["+condition+"] => "+work+"}";
 	}
 }

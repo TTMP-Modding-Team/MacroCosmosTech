@@ -54,11 +54,14 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer,
 
 	@Override public Transaction setPokemon(int index, @Nullable Pokemon pokemon, @Nullable UUID ownerId){
 		return index>=0&&index<size()&&(pokemon==null||(isOwnerOf(ownerId, index)&&isValid(pokemon, index))) ?
-				Transaction.success(() -> {
-					getStorage().set(index, pokemon);
-					pokemonOwners[index] = ownerId;
-				}) : Transaction.fail();
+				Transaction.success(() -> setPokemonInternal(index, pokemon, ownerId)) : Transaction.fail();
 	}
+
+	protected void setPokemonInternal(int index, @Nullable Pokemon pokemon, @Nullable UUID ownerId){
+		getStorage().set(index, pokemon);
+		pokemonOwners[index] = ownerId;
+	}
+
 	@Override public boolean isValid(Pokemon pokemon, int index){
 		return true;
 	}
@@ -102,9 +105,9 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer,
 			NBTTagList pokemon = tag.getTagList("Pokemon", Constants.NBT.TAG_COMPOUND);
 			for(int i = 0; i<pokemon.tagCount(); i++){
 				NBTTagCompound pokemonTag = pokemon.getCompoundTagAt(i);
-				int at = pokemonTag.getInteger("_i");
-				this.pokemons[at] = Pixelmon.pokemonFactory.create(pokemonTag);
-				this.pokemonOwners[at] = pokemonTag.hasUniqueId("_owner") ? pokemonTag.getUniqueId("_owner") : null;
+				setPokemonInternal(pokemonTag.getInteger("_i"),
+						Pixelmon.pokemonFactory.create(pokemonTag),
+						pokemonTag.hasUniqueId("_owner") ? pokemonTag.getUniqueId("_owner") : null);
 			}
 		}
 	}
@@ -124,7 +127,8 @@ public class PokemonContainerTrait extends MTETrait implements PokemonContainer,
 	}
 
 	private void syncPokemon(){
-		writeCustomData(SYNC_POKEMON, this::writeInitialData);
+		if(metaTileEntity.getWorld()!=null)
+			writeCustomData(SYNC_POKEMON, this::writeInitialData);
 	}
 	@Override public void receiveCustomData(int id, PacketBuffer buffer){
 		if(id!=SYNC_POKEMON) return;

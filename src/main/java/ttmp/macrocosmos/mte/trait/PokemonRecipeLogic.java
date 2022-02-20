@@ -23,19 +23,23 @@ import ttmp.macrocosmos.capability.PokemonContainer;
 import ttmp.macrocosmos.item.ModItems;
 import ttmp.macrocosmos.recipe.poke.PokeRecipe;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeMap;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeMatch;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeMetadata;
 import ttmp.macrocosmos.recipe.poke.PokeRecipeSkillBonus;
+import ttmp.macrocosmos.recipe.poke.PokeRecipeWorkType;
+import ttmp.macrocosmos.recipe.poke.condition.PokemonCondition;
 import ttmp.macrocosmos.recipe.poke.value.PokemonValue;
 import ttmp.macrocosmos.util.ActivePokemonSkillBonuses;
-import ttmp.macrocosmos.recipe.poke.PokeRecipeMatch;
+import ttmp.macrocosmos.util.PokemonRecipeWorkable;
 import ttmp.macrocosmos.util.PokemonWorkCache;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class PokemonRecipeLogic extends RecipeLogicEnergy{
+public class PokemonRecipeLogic extends RecipeLogicEnergy implements PokemonRecipeWorkable{
 	public static final IEnergyContainer PRIMITIVE_ENERGY_CONTAINER = new IEnergyContainer(){
 		@Override public long acceptEnergyFromNetwork(EnumFacing side, long voltage, long amperage){
 			return 0;
@@ -66,15 +70,17 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	private final PokemonContainer pokemonInput;
 	protected final PokeRecipeMetadata defaultMetadata;
 
-	protected final ActivePokemonSkillBonuses skillBonuses = new ActivePokemonSkillBonuses();
+	protected final ActivePokemonSkillBonuses activeSkillBonuses = new ActivePokemonSkillBonuses();
 	protected final PokemonWorkCache workCache = new PokemonWorkCache(this);
 
-	@Nullable protected PokeRecipeMetadata recipeMetadata;
+	@Nullable private PokeRecipeMetadata recipeMetadata;
 
 	protected float partialProgressTime;
 	protected boolean pokemonUpdated;
 
 	protected float overclockPercentage = 1;
+
+	private float progressPerTickCache;
 
 	public PokemonRecipeLogic(MetaTileEntity metaTileEntity, PokeRecipeMap<?> recipeMap, PokemonContainer pokemonInput){
 		this(metaTileEntity, recipeMap, () -> PRIMITIVE_ENERGY_CONTAINER, pokemonInput);
@@ -95,11 +101,58 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		}
 	}
 
+	public PokemonContainer getPokemonInput(){
+		return pokemonInput;
+	}
+
 	public PokeRecipeMetadata getDefaultMetadata(){
 		return defaultMetadata;
 	}
-	@Nullable public PokeRecipeMetadata getRecipeMetadata(){
+	@Nullable public final PokeRecipeMetadata getRecipeMetadata(){
 		return recipeMetadata;
+	}
+	protected final void setRecipeMetadata(@Nullable PokeRecipeMetadata recipeMetadata){
+		this.recipeMetadata = recipeMetadata;
+		this.recipeConditions = null;
+		this.recipeProgress = null;
+		this.recipeWorkType = null;
+		this.recipeHpToWorkConversionRate = null;
+		this.recipeSkillBonus = null;
+	}
+
+	@Nullable private List<PokemonCondition> recipeConditions;
+	@Nullable private PokemonValue recipeProgress;
+	@Nullable private PokeRecipeWorkType recipeWorkType;
+	@Nullable private PokemonValue recipeHpToWorkConversionRate;
+	@Nullable private Set<PokeRecipeSkillBonus> recipeSkillBonus;
+
+	public List<PokemonCondition> getRecipeConditions(){
+		if(recipeConditions==null) recipeConditions = defaultMetadata.getConditions(recipeMetadata);
+		return recipeConditions;
+	}
+	public PokemonValue getRecipeProgress(){
+		if(recipeProgress==null) recipeProgress = defaultMetadata.getProgress(recipeMetadata);
+		return recipeProgress;
+	}
+	public PokeRecipeWorkType getRecipeWorkType(){
+		if(recipeWorkType==null) recipeWorkType = defaultMetadata.getWorkType(recipeMetadata);
+		return recipeWorkType;
+	}
+	public PokemonValue getRecipeHpToWorkConversionRate(){
+		if(recipeHpToWorkConversionRate==null) recipeHpToWorkConversionRate = defaultMetadata.getHpToWorkConversionRate(recipeMetadata);
+		return recipeHpToWorkConversionRate;
+	}
+	public Set<PokeRecipeSkillBonus> getRecipeSkillBonus(){
+		if(recipeSkillBonus==null) recipeSkillBonus = defaultMetadata.getSkillBonus(recipeMetadata);
+		return recipeSkillBonus;
+	}
+
+	public ActivePokemonSkillBonuses getActiveSkillBonuses(){
+		return activeSkillBonuses;
+	}
+
+	public float getOverclockPercentage(){
+		return overclockPercentage;
 	}
 
 	@Override public String getName(){
@@ -111,7 +164,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 
 	@Override protected IItemHandlerModifiable getInputInventory(){
 		if(inputInventory==null){
-			ingredientWrapperItem = new ItemStack(ModItems.SHH);
+			ingredientWrapperItem = new ItemStack(ModItems.POKE_RECIPE_INGREDIENT);
 			inputInventory = new CombinedInvWrapper(new SingleItemStackHandler(ingredientWrapperItem), getActualInputInventory());
 		}
 		if(ingredientWrapperItem!=null){
@@ -135,12 +188,18 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		return pokemonUpdated||super.hasNotifiedInputs();
 	}
 
-	@Override protected boolean canProgressRecipe(){
-		return PokeRecipeMatch.test(this.defaultMetadata.getConditions(this.recipeMetadata), this.pokemonInput);
+	@Override public float getProgressFloat(){
+		return partialProgressTime;
+	}
+	@Override public float getMaxProgressFloat(){
+		return getMaxProgress();
+	}
+	@Override public float getEstimatedProgressPerTick(){
+		return getMaxProgressFloat()<=0 ? 0 : progressPerTickCache;
 	}
 
 	@Override public void update(){
-		skillBonuses.tickActiveSkillBonus(pokemonInput);
+		activeSkillBonuses.tickActiveSkillBonus(pokemonInput);
 		super.update();
 	}
 
@@ -174,40 +233,41 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	}
 
 	protected boolean progress(){
-		if(!canRecipeProgress||!drawEnergy(recipeEUt, true)) return false;
-		drawEnergy(recipeEUt, false);
+		if(!canRecipeProgress||
+				!PokeRecipeMatch.test(getRecipeConditions(), this.pokemonInput)||
+				!drawEnergy(recipeEUt, true)) return false;
 
 		float progressModifier = workToProgress();
-		if(progressModifier>0){
-			partialProgressTime += progressModifier;
-			progressTime = Math.max(1, (int)partialProgressTime);
-		}
+		this.progressPerTickCache = Math.max(0, progressModifier);
+		if(progressModifier<=0) return false;
+
+		drawEnergy(recipeEUt, false);
+		this.partialProgressTime += progressModifier;
+		this.progressTime = Math.max(1, (int)partialProgressTime);
 		return true;
 	}
 
 	protected float workToProgress(){
-		PokemonValue progressValue = defaultMetadata.getProgress(recipeMetadata);
-		Set<PokeRecipeSkillBonus> skillBonus = defaultMetadata.getSkillBonus(recipeMetadata);
 		float progress = 0;
 		for(int i = 0; i<pokemonInput.size(); i++){
 			Pokemon pokemon = pokemonInput.getPokemon(i);
-			if(pokemon!=null)
-				progress += this.workCache.consumeWork(i, pokemon, progressValue.getValue(pokemon))
-						*this.skillBonuses.getSkillBonus(i, pokemon, skillBonus);
+			if(pokemon!=null&&PokeRecipeMatch.matchesAny(pokemon, getRecipeConditions()))
+				progress += this.workCache.consumeWork(i, pokemon, getRecipeProgress().getValue(pokemon)*overclockPercentage)/overclockPercentage
+						*this.activeSkillBonuses.getSkillBonus(i, pokemon, getRecipeSkillBonus());
 		}
 		return progress;
 	}
 
 	@Override protected void setupRecipe(Recipe recipe){
 		super.setupRecipe(recipe);
-		this.recipeMetadata = recipe instanceof PokeRecipe ? ((PokeRecipe)recipe).getMetadata() : null;
+		setRecipeMetadata(recipe instanceof PokeRecipe ? ((PokeRecipe)recipe).getMetadata() : null);
 		this.partialProgressTime = 1;
 		this.overclockPercentage = (float)recipe.getDuration()/this.getMaxProgress();
 	}
 	@Override protected void completeRecipe(){
 		super.completeRecipe();
 		this.partialProgressTime = 0;
-		this.recipeMetadata = null;
+		setRecipeMetadata(null);
 	}
 	public void cancelRecipe(){
 		this.progressTime = 0;
@@ -219,7 +279,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		this.wasActiveAndNeedsUpdate = true;
 		this.parallelRecipesPerformed = 0;
 		this.partialProgressTime = 0;
-		this.recipeMetadata = null;
+		setRecipeMetadata(null);
 	}
 
 	public void markPokemonUpdated(boolean pokemonUpdated){
@@ -230,7 +290,7 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 		NBTTagCompound tag = super.serializeNBT();
 		tag.setFloat("Progress", partialProgressTime);
 		if(recipeMetadata!=null) tag.setByteArray("recipeMetadata", recipeMetadata.writeToByteArray());
-		tag.setTag("SkillBonuses", this.skillBonuses.write());
+		tag.setTag("SkillBonuses", this.activeSkillBonuses.write());
 		tag.setTag("Works", workCache.write());
 		tag.setFloat("OverclockPercentage", overclockPercentage);
 		return tag;
@@ -238,9 +298,9 @@ public class PokemonRecipeLogic extends RecipeLogicEnergy{
 	@Override public void deserializeNBT(@Nonnull NBTTagCompound tag){
 		super.deserializeNBT(tag);
 		this.partialProgressTime = tag.getFloat("Progress");
-		this.recipeMetadata = tag.hasKey("recipeMetadata", Constants.NBT.TAG_BYTE_ARRAY) ?
-				PokeRecipeMetadata.read(tag.getByteArray("recipeMetadata")) : null;
-		this.skillBonuses.read(tag.getTagList("SkillBonuses", Constants.NBT.TAG_COMPOUND));
+		setRecipeMetadata(tag.hasKey("recipeMetadata", Constants.NBT.TAG_BYTE_ARRAY) ?
+				PokeRecipeMetadata.read(tag.getByteArray("recipeMetadata")) : null);
+		this.activeSkillBonuses.read(tag.getTagList("SkillBonuses", Constants.NBT.TAG_COMPOUND));
 		this.workCache.read(tag.getTagList("Works", Constants.NBT.TAG_COMPOUND));
 		this.overclockPercentage = tag.getFloat("OverclockPercentage");
 	}

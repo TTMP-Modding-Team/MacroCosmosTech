@@ -10,7 +10,7 @@ import ttmp.macrocosmos.util.Join;
 
 import java.util.EnumSet;
 
-public class RawStatValue implements PokemonValue{
+public class StatValue implements PokemonValue{
 	protected static final StatsType[] allowedValues = {
 			StatsType.Attack,
 			StatsType.Defence,
@@ -19,29 +19,27 @@ public class RawStatValue implements PokemonValue{
 			StatsType.Speed
 	};
 
-	public static RawStatValue all(){
-		return new RawStatValue(allowedValues);
+	public static StatValue all(){
+		return new StatValue(allowedValues);
 	}
 
-	public static RawStatValue read(PacketBuffer buffer){
-		return new RawStatValue(buffer.readByte());
+	public static StatValue read(PacketBuffer buffer){
+		return new StatValue(buffer.readByte());
 	}
 
 	protected final EnumSet<StatsType> stats = EnumSet.noneOf(StatsType.class);
 
-	public RawStatValue(StatsType... stat){
+	public StatValue(StatsType... stat){
 		for(StatsType s : stat){
-			if(!ArrayUtils.contains(allowedValues, stat))
-				MacroCosmosMod.LOGGER.info("StatBasedWork can only use [{}], not {}", Join.join(allowedValues), stat);
+			if(!ArrayUtils.contains(allowedValues, s))
+				MacroCosmosMod.LOGGER.error("StatBasedWork can only use [{}], not {}", Join.join(allowedValues), s);
 			else stats.add(s);
 		}
 	}
-	protected RawStatValue(byte bitMask){
-		for(StatsType s : allowedValues){
-			if(BitMask.get(bitMask, s.getStatIndex())){
+	protected StatValue(byte bitMask){
+		for(StatsType s : allowedValues)
+			if(BitMask.get(bitMask, s.getStatIndex()))
 				this.stats.add(s);
-			}
-		}
 	}
 
 	@Override public float getValue(Pokemon pokemon){
@@ -60,7 +58,7 @@ public class RawStatValue implements PokemonValue{
 	}
 
 	@Override public byte type(){
-		return Types.RAW_STAT;
+		return Types.STAT;
 	}
 
 	@Override public void writeAdditional(PacketBuffer buffer){

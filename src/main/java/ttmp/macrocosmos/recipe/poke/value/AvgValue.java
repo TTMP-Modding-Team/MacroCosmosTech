@@ -23,6 +23,7 @@ public class AvgValue extends MultipleValue{
 			sum += e.getValue(pokemon);
 		return sum/values.length;
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){
 		buffer.writeVarInt(values.length);
 		for(PokemonValue work : values)

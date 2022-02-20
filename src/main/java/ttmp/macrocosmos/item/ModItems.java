@@ -20,13 +20,15 @@ public class ModItems{
 	}
 
 	public static final Item POCKETPOKEMONPC = definitelyNotNull();
-	public static final Item SHH = definitelyNotNull();
+	public static final Item POKE_RECIPE_INGREDIENT = definitelyNotNull();
+	public static final Item FUCKING_DEBUGGER = definitelyNotNull();
 
 	@SubscribeEvent
 	public static void registerItems(RegistryEvent.Register<Item> e){
 		IForgeRegistry<Item> registry = e.getRegistry();
 		register(registry, "pocketpokemonpc", new PocketPokemonPC().setMaxStackSize(1));
 		registry.register(new PokeRecipeIngredientItem().setRegistryName("poke_recipe_ingredient"));
+		register(registry, "fucking_debugger", new FuckingDebuggerItem().setMaxStackSize(1));
 	}
 
 	private static void register(IForgeRegistry<Item> registry, String name, Item item){

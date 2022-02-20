@@ -25,7 +25,7 @@ public class PokeRecipeMatch{
 			for(int i = 0; i<container.size(); i++){
 				if(BitMask.get(excludedPokemonFlag, i)) continue;
 				Pokemon pokemon = container.getPokemon(i);
-				if(pokemon==null||!condition.test(pokemon)) continue;
+				if(pokemon==null||pokemon.getHealth()<=0||!condition.test(pokemon)) continue;
 				count++;
 				pokemonFlag = BitMask.set(pokemonFlag, i, true);
 			}
@@ -58,6 +58,13 @@ public class PokeRecipeMatch{
 		if(incompleteConditions.size()<=1) return true; // check again before (possibly) the most expensive part of the algorithm
 
 		return bruteForce(incompleteConditions, 0, 0, container.size());
+	}
+
+	public static boolean matchesAny(Pokemon pokemon, List<PokemonCondition> conditions){
+		if(pokemon.getHealth()<=0) return false;
+		for(PokemonCondition c : conditions)
+			if(c.test(pokemon)) return true;
+		return false;
 	}
 
 	/**

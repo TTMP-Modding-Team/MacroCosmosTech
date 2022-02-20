@@ -17,6 +17,7 @@ public class ConstantValue implements PokemonValue{
 	@Override public float getValue(Pokemon pokemon){
 		return value;
 	}
+
 	@Override public void writeAdditional(PacketBuffer buffer){}
 
 	@Override public byte type(){

@@ -26,4 +26,8 @@ public class DivValue implements PokemonValue{
 		num.write(buffer);
 		denom.write(buffer);
 	}
+
+	@Override public String toString(){
+		return "("+num+" / "+denom+")";
+	}
 }

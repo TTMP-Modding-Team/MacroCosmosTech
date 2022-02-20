@@ -73,10 +73,10 @@ public interface PokemonValue extends TypedSerializable{
 		return new SelectedValue(condition, onTrue, onFalse);
 	}
 	static PokemonValue allStat(){
-		return RawStatValue.all();
+		return StatValue.all();
 	}
 	static PokemonValue stat(StatsType... stats){
-		return stats.length==0 ? zero() : new RawStatValue(stats);
+		return stats.length==0 ? zero() : new StatValue(stats);
 	}
 	static PokemonValue level(){
 		return SingletonValue.LEVEL;
@@ -117,8 +117,8 @@ public interface PokemonValue extends TypedSerializable{
 				return ConditionedValue.read(buffer);
 			case Types.SELECT:
 				return SelectedValue.read(buffer);
-			case Types.RAW_STAT:
-				return RawStatValue.read(buffer);
+			case Types.STAT:
+				return StatValue.read(buffer);
 			case Types.LEVEL:
 				return SingletonValue.LEVEL;
 			case Types.DEGRADATION:
@@ -146,7 +146,7 @@ public interface PokemonValue extends TypedSerializable{
 		byte RANDOM = 6;
 		byte CONDITION = 7;
 		byte SELECT = 8;
-		byte RAW_STAT = 9;
+		byte STAT = 9;
 		byte LEVEL = 10;
 		byte DEGRADATION = 11;
 		byte EFFECTIVENESS = 12;
